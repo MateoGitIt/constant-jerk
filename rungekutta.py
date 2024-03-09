@@ -37,11 +37,11 @@ def main():
         Y.append(new_Y)
 
     # plot curve of values X and Y
-    plt.plot(X, Y, lw=1, label = "RK4")
+    plt.plot(X, Y, lw=1)
+    plt.title("Runge-Kutta 4 y(x) curve")
     plt.xlabel("x (m)")
     plt.ylabel("y (m)")
     plt.grid("both")
-    plt.legend()
     plt.show()
 
 # right-hand side of the autonomous differential equation
@@ -52,13 +52,10 @@ def func(u):
 
 
 def rungekutta_kvalues(u):
-
-    # takes in a u value, calls f(u), computes k-values, and returns them
     k1 = func(u)
     k2 = func(u + (h * (k1/2)))
     k3 = func(u + (h * (k2/2)))
     k4 = func(u + (h * k3))
-
     return k1, k2, k3, k4
 
 
