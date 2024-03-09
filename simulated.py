@@ -4,16 +4,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # unpack inputs from "inputParams.py"
-Jt, Q, g, a0, v0, y0, xmax, tmax, h = parameters.values()
-
-"""
-I' used h for time increment for the simulated curve. We can easily let the user have choose different increments if we want though. 
-"""
+Jt, Q, g, a0, v0, y0, xmax, tmax, h, dt = parameters.values()
 
 # declare time, X and Y arrays
 X = np.array()
 Y = np.array()
-t = np.linspace(0, tmax, h)
+t = np.linspace(0, tmax, dt)
 
 def main():
     pass

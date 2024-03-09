@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # unpack inputs from "inputParams.py"
-Jt, Q, g, a0, v0, y0, xmax, tmax, h = parameters.values()
+Jt, Q, g, a0, v0, y0, xmax, tmax, h, dt = parameters.values()
 
 # declare array for U_i, Y_i, and x_i values
 U = np.array()

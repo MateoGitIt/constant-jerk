@@ -18,6 +18,7 @@ initialHeight = 1
 xmax = 1
 tmax = 1
 stepSize = 0.001
+timeIncrement = 0.001
 
 parameters = {"j_t":  tangentialJerk, 
               "Q": factorQ, 
@@ -27,4 +28,5 @@ parameters = {"j_t":  tangentialJerk,
               "y_0": initialHeight, 
               "xmax": xmax, 
               "tmax": tmax,
-              "h": stepSize}
+              "h": stepSize,
+              "dt": timeIncrement}
