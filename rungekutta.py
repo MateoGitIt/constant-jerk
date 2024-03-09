@@ -14,11 +14,11 @@ X = np.linspace(0, xmax, h)
 # append initial height
 Y.append(y0)
 
+# calculate U0 (which equals y'(x) at t = 0) and append to U array; SHOULD WE INCLUDE Q IN THE DENOMINATOR? PAPER DOESN'T, jerk2mp.py DOES
+U0 = -1 * (a0/g) / sqrt(1 - pow(a0/g, 2))
+U.append(U0)
+
 def main():
-    
-    # calculate U0 (which equals y'(x) at t = 0) and append to U array; SHOULD WE INCLUDE Q IN THE DENOMINATOR? PAPER DOESN'T, jerk2mp.py DOES
-    U0 = -1 * (a0/g) / sqrt(1 - pow(a0/g, 2))
-    U.append(U0)
 
     # calculate new U-values and record them
     for i in range(1, len(X)):
@@ -27,7 +27,8 @@ def main():
         U.append(new_U)
 
     """
-    I imagine that the y-values are calculated from y'(x) using y = y0 + y'(x)dx = y0 + y'(x)h  
+    I imagine that the y-values are calculated from y'(x) using y = y0 + y'(x)dx = y0 + y'(x)h. Let me know if this is not the case and I'll
+    re-implement the lines of code below again.
     """
 
     # calculated y(x) from u(x) = y´(x)

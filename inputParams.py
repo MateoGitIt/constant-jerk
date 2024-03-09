@@ -1,7 +1,7 @@
 """
 
 This script allows you to pass in the initial conditions and arguments for rungekutta.py and simulated.py. Change the value of each variable in lines X through Y
-to achieve the desired initial conditions and step size. The [main.py] script expects the data to arrive through this file and in dictionary-format used below.
+to achieve the desired initial conditions and step size/time increments. The [main.py] script expects the data to arrive through this file and in dictionary-format used below.
 If you change any input parameters here, make sure to make [main.py] compatible to these changes.
 
 The [main.py] script expects values for tangential jerk (tangentialJerk), Q (factorQ), g (gravityAccel), initial speed (initialSpeed), and step size for 
