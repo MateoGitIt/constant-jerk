@@ -16,6 +16,7 @@ initialAcceleration = 1
 initialSpeed = 1
 initialHeight = 1
 xmax = 1
+tmax = 1
 stepSize = 0.001
 
 parameters = {"j_t":  tangentialJerk, 
@@ -25,4 +26,5 @@ parameters = {"j_t":  tangentialJerk,
               "v_0": initialSpeed, 
               "y_0": initialHeight, 
               "xmax": xmax, 
+              "tmax": tmax,
               "h": stepSize}
