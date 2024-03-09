@@ -46,9 +46,8 @@ def veloc(t):
     return v0 + (a0*t) + (0.5 * Jt * pow(t, 2))
 
 
-# newX and newY take in index i to access i - 1 X and Y values
-
 """
+
 Is y(x_i-1) accessing the i-th or the (i - 1)th time value? Is V_i-1 doing the same?
 
 This current implementation accesses the (i-1)th value of each array
