@@ -34,7 +34,7 @@ def main():
         Y.append(new_Y)
 
     # plot curve of values X and Y
-    plt.plot(X, Y, lw=2.5)
+    plt.plot(X, Y, lw=3, color="tab:red")
     plt.title("Runge-Kutta 4 y(x) curve")
     plt.xlabel("x (m)")
     plt.ylabel("y (m)")
@@ -49,7 +49,7 @@ def func(u):
 
     # when initial conditions are invalid, they typically create an error in this line
     try:
-        numerator = -1 * Jt * Q * pow(1 + pow(u, 2), 5) 
+        numerator = -1 * Jt * Q * pow(1 + pow(u, 2), 2) 
     except OverflowError as e:
         exit(f"OverflowError: {e}.\nInitial conditions may not be valid or cause some " 
              "equations to break down mathematically.\nInputting smaller xmax, initial acceleration, " 

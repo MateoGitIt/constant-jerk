@@ -6,7 +6,7 @@ If you change any input parameters here, make sure to make [main.py] compatible 
 
 """
 
-tangentialJerk = 10
+tangentialJerk = 0.5
 factorQ = 1
 g = 9.81
 initialAcceleration = 0
