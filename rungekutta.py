@@ -7,9 +7,10 @@ import numpy as np
 Jt, Q, g, a0, v0, y0, xmax, tmax, h, dt = parameters.values()
 
 # declare array for U_i, Y_i, and x_i values
-U = np.array()
-Y = np.array()
-X = np.linspace(0, xmax, h) 
+U = []
+Y = []
+X = np.linspace(0, xmax, int(xmax / h)) 
+X = X.tolist()
 
 # append initial height
 Y.append(y0)
@@ -26,27 +27,25 @@ def main():
         new_U = U[i-1] + (h/6)*(k1 + (2*k2) + (2*k3) + k4)
         U.append(new_U)
 
-    """
-    I imagine that the y-values are calculated from y'(x) using y = y0 + y'(x)dx = y0 + y'(x)h. Let me know if this is not the case and I'll
-    re-implement the lines of code below again.
-    """
-
     # calculated y(x) from u(x) = y´(x)
     for i in range(1, len(X)):
         new_Y = Y[i-1] + (U[i-1] * h)
         Y.append(new_Y)
 
     # plot curve of values X and Y
-    plt.plot(X, Y, lw=1)
+    plt.plot(X, Y, lw=2.5)
     plt.title("Runge-Kutta 4 y(x) curve")
     plt.xlabel("x (m)")
     plt.ylabel("y (m)")
+    plt.ylim(0, y0+1)
+    plt.xlim(0, xmax+1)
     plt.grid("both")
     plt.show()
 
+
 # right-hand side of the autonomous differential equation
 def func(u):
-    numerator = -1 * Jt * Q * pow(1 + pow(u, 2), 2) 
+    numerator = -1 * Jt * Q * pow(1 + pow(u, 2), 5) 
     denominator = g * sqrt(pow(v0, 2) - (2/Q) * g * h * u)
     return numerator/denominator
 

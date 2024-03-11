@@ -6,16 +6,16 @@ If you change any input parameters here, make sure to make [main.py] compatible 
 
 """
 
-tangentialJerk = 1
+tangentialJerk = 0.5
 factorQ = 1
 g = 9.81
-initialAcceleration = 1
+initialAcceleration = 0
 initialSpeed = 1
 initialHeight = 1
-xmax = 1
-tmax = 1
-stepSize = 0.001
-timeIncrement = 0.001
+xmax = 8     # Integer values above 8 yield OverflowError: math range error
+tmax = 2
+stepSize = 0.0001
+timeIncrement = 0.00001
 
 parameters = {"j_t":  tangentialJerk, 
               "Q": factorQ, 
@@ -23,7 +23,12 @@ parameters = {"j_t":  tangentialJerk,
               "a_0": initialAcceleration, 
               "v_0": initialSpeed, 
               "y_0": initialHeight, 
-              "xmax": xmax, 
+              "xmax": xmax,
               "tmax": tmax,
               "h": stepSize,
               "dt": timeIncrement}
+
+
+"""
+Smallest step size successfully tried: 0.000001
+"""
