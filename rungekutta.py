@@ -16,7 +16,7 @@ X = X.tolist()
 # append initial height
 Y.append(y0)
 
-# calculate U0 (which equals y'(x) at t = 0) and append to U array; SHOULD WE INCLUDE Q IN THE DENOMINATOR? PAPER DOESN'T, jerk2mp.py DOES
+# calculate U0 (which equals y'(x) at t = 0) and append to U array
 U0 = -1 * (a0/g) / sqrt(1 - pow(a0/g, 2))
 U.append(U0)
 
