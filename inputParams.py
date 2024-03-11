@@ -6,13 +6,13 @@ If you change any input parameters here, make sure to make [main.py] compatible 
 
 """
 
-tangentialJerk = 0.5
+tangentialJerk = 10
 factorQ = 1
 g = 9.81
 initialAcceleration = 0
 initialSpeed = 1
 initialHeight = 1
-xmax = 8     # Integer values above 8 yield OverflowError: math range error
+xmax = 8
 tmax = 2
 stepSize = 0.0001
 timeIncrement = 0.00001

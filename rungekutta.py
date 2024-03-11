@@ -1,5 +1,6 @@
 from inputParams import parameters
 from math import pow, sqrt
+from sys import exit
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -45,7 +46,15 @@ def main():
 
 # right-hand side of the autonomous differential equation
 def func(u):
-    numerator = -1 * Jt * Q * pow(1 + pow(u, 2), 5) 
+
+    # when initial conditions are invalid, they typically create an error in this line
+    try:
+        numerator = -1 * Jt * Q * pow(1 + pow(u, 2), 5) 
+    except OverflowError as e:
+        exit(f"OverflowError: {e}.\nInitial conditions may not be valid or cause some " 
+             "equations to break down mathematically.\nInputting smaller xmax, initial acceleration, " 
+             "or jerk values may resolve this error.")
+        
     denominator = g * sqrt(pow(v0, 2) - (2/Q) * g * h * u)
     return numerator/denominator
 
