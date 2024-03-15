@@ -24,12 +24,9 @@ def main():
 
     # calculate new U-values and record them
     for i in range(1, len(X)):
-        k1, k2, k3, k4 = rungekutta_kvalues(U[i-1])
+        k1, k2, k3, k4 = rungekutta_kvalues(U[i-1], Y[i-1])
         new_U = U[i-1] + (h/6)*(k1 + (2*k2) + (2*k3) + k4)
         U.append(new_U)
-
-    # calculated y(x) from u(x) = y´(x)
-    for i in range(1, len(X)):
         new_Y = Y[i-1] + (U[i-1] * h)
         Y.append(new_Y)
 
@@ -45,25 +42,24 @@ def main():
 
 
 # right-hand side of the autonomous differential equation
-def func(u):
+def func(u, y_i):
 
-    # when initial conditions are invalid, they typically create an error in this line
-    try:
-        numerator = -1 * Jt * Q * pow(1 + pow(u, 2), 2) 
-    except OverflowError as e:
-        exit(f"OverflowError: {e}.\nInitial conditions may not be valid or cause some " 
-             "equations to break down mathematically.\nInputting smaller xmax, initial acceleration, " 
-             "or jerk values may resolve this error.")
+    factor1 = (1 + pow(u, 2)) / (2 * pow(veloc(u, y_i), 2))
+    radicand = pow(g/Q, 2) - (4 * veloc(u, y_i) * Jt * (1 + pow(u, 2)))
+    factor2 = (-1 * g/Q) + sqrt(radicand)
+    return factor1 * factor2
         
-    denominator = g * sqrt(pow(v0, 2) - (2/Q) * g * h * u)
-    return numerator/denominator
+
+def veloc(u, y_i):
+    second_term = 2 * g * (y0 - (y_i +(u*h))) / Q
+    return sqrt(pow(v0, 2) + second_term)
 
 
-def rungekutta_kvalues(u):
-    k1 = func(u)
-    k2 = func(u + (h * (k1/2)))
-    k3 = func(u + (h * (k2/2)))
-    k4 = func(u + (h * k3))
+def rungekutta_kvalues(u, y_i):
+    k1 = func(u, y_i)
+    k2 = func(u + (h * (k1/2)), y_i)
+    k3 = func(u + (h * (k2/2)), y_i)
+    k4 = func(u + (h * k3), y_i)
     return k1, k2, k3, k4
 
 

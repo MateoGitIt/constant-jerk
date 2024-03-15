@@ -24,8 +24,10 @@ def main():
         Y.append(newY)
 
     # plot X and Y values
-    plt.plot(X, Y, lw=2.5)
+    plt.plot(X, Y, lw=3, color="tab:blue")
     plt.title("Simulated y(x) curve from kinematic equations")
+    plt.ylim(0, y0+1)
+    plt.xlim(0, xmax+1)
     plt.xlabel("x (m)")
     plt.ylabel("y (m)")
     plt.grid("both")
@@ -48,7 +50,7 @@ def veloc(t):
 """
 Is y(x_i-1) accessing the i-th or the (i - 1)th time value? Is V_i-1 doing the same?
 
-This current implementation accesses the (i-1)th value of each array
+This current implementation accesses the (i-1)th value of each array. I tried both options but don't change the curve at all. 
 """
 
 def newPoint(i, t):
