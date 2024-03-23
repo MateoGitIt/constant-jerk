@@ -6,18 +6,24 @@ If you change any input parameters here, make sure to make [main.py] compatible 
 
 """
 
-tangentialJerk = 0.5
+# Jerk and jerk factor
+tangentialJerk = 3
+if tangentialJerk <= 0: jerkfactor = 1
+else: jerkfactor = -1
+
+# rest of initial conditions
 factorQ = 1
 g = 9.81
 initialAcceleration = 0
 initialSpeed = 1
 initialHeight = 1
-xmax = 8
+xmax = 9
 tmax = 10
 stepSize = 0.001
 timeIncrement = 0.01
 
 parameters = {"j_t":  tangentialJerk, 
+              "j_f": jerkfactor,
               "Q": factorQ, 
               "g": g, 
               "a_0": initialAcceleration, 
@@ -29,6 +35,3 @@ parameters = {"j_t":  tangentialJerk,
               "dt": timeIncrement}
 
 
-"""
-Smallest step size successfully tried: 0.000001
-"""

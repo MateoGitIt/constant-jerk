@@ -1,11 +1,12 @@
 from inputParams import parameters
 from math import pow, sqrt
 from sys import exit
+import time
 import matplotlib.pyplot as plt
 import numpy as np
 
 # unpack inputs from "inputParams.py"
-Jt, Q, g, a0, v0, y0, xmax, tmax, h, dt = parameters.values()
+Jt, Jf, Q, g, a0, v0, y0, xmax, tmax, h, dt = parameters.values()
 
 # declare array for U_i, Y_i, and x_i values
 U = []
@@ -22,7 +23,7 @@ U.append(U0)
 
 def main():
 
-    # calculate new U-values and record them
+    # calculate new U and Y values and record them in lists
     for i in range(1, len(X)):
         k1, k2, k3, k4 = rungekutta_kvalues(U[i-1], Y[i-1])
         new_U = U[i-1] + (h/6)*(k1 + (2*k2) + (2*k3) + k4)
@@ -44,8 +45,8 @@ def main():
 # right-hand side of the autonomous differential equation
 def func(u, y_i):
 
-    factor1 = (1 + pow(u, 2)) / (2 * pow(veloc(u, y_i), 2))
-    radicand = pow(g/Q, 2) - (4 * veloc(u, y_i) * Jt * (1 + pow(u, 2)))
+    factor1 = Jf * (1 + pow(u, 2)) / (2 * pow(veloc(u, y_i), 2))
+    radicand = pow(g/Q, 2) - (Jf * 4 * veloc(u, y_i) * Jt * (1 + pow(u, 2)))
     factor2 = (-1 * g/Q) + sqrt(radicand)
     return factor1 * factor2
         
@@ -64,4 +65,7 @@ def rungekutta_kvalues(u, y_i):
 
 
 if __name__ == "__main__":
+    start =  time.time()
     main()
+    print(f"Execution time: {start - time.time()}")
+    plt.show()
