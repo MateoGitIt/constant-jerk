@@ -1,6 +1,7 @@
 from inputParams import parameters
 from math import pow, sqrt
 from sys import exit
+import helpers as help
 import time
 import matplotlib.pyplot as plt
 import numpy as np
@@ -37,9 +38,9 @@ def main():
     plt.xlabel("x (m)")
     plt.ylabel("y (m)")
     plt.ylim(0, y0+1)
-    plt.xlim(0, xmax+1)
+    try:  plt.xlim(0, help.xAxis(X, Y) + 1)
+    except: plt.xlim(0, xmax + 1) 
     plt.grid("both")
-    plt.show()
 
 
 # right-hand side of the autonomous differential equation
@@ -66,6 +67,11 @@ def rungekutta_kvalues(u, y_i):
 
 if __name__ == "__main__":
     start =  time.time()
-    main()
-    print(f"Execution time: {start - time.time()}")
+    try:
+        main()
+        print(f"Execution time: {round(time.time() - start, 2)} seconds")
+    except Exception as e:
+        exit(f"An error occured: {e}. Physically impossible initial conditions "
+             "may cause some equations to break down. Try different initial conditions.")
+        
     plt.show()

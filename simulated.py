@@ -1,10 +1,12 @@
 from inputParams import parameters
 from math import pow, sqrt
+import time
+import helpers as help
 import matplotlib.pyplot as plt
 import numpy as np
 
 # unpack inputs from "inputParams.py"
-Jt, Q, g, a0, v0, y0, xmax, tmax, h, dt = parameters.values()
+Jt, Jf, Q, g, a0, v0, y0, xmax, tmax, h, dt = parameters.values()
 
 # declare time, X and Y arrays
 X = []
@@ -12,7 +14,7 @@ Y = []
 t = np.linspace(0, tmax, int(tmax / dt))
 
 # append x0 and y0
-X.append(0) # ---> I imagine the curve starts at horizontal position x = 0, right?
+X.append(0) 
 Y.append(y0)
 
 def main():
@@ -27,11 +29,10 @@ def main():
     plt.plot(X, Y, lw=3, color="tab:blue")
     plt.title("Simulated y(x) curve from kinematic equations")
     plt.ylim(0, y0+1)
-    plt.xlim(0, xmax+1)
+    plt.xlim(0, help.xAxis(X, Y) + 1)
     plt.xlabel("x (m)")
     plt.ylabel("y (m)")
     plt.grid("both")
-    plt.show()
 
 # t-notation is used because y'(x) can be written in terms of time with kinematic equations
 def yprime(t):
@@ -47,11 +48,6 @@ def accel(t):
 def veloc(t):
     return v0 + (a0*t) + (0.5 * Jt * pow(t, 2))
 
-"""
-Is y(x_i-1) accessing the i-th or the (i - 1)th time value? Is V_i-1 doing the same?
-
-This current implementation accesses the (i-1)th value of each array. I tried both options but don't change the curve at all. 
-"""
 
 def newPoint(i, t):
     # calculate parts shared by both x and y formulae in the numerators and denominators
@@ -65,4 +61,7 @@ def newPoint(i, t):
 
 
 if __name__ == "__main__":
+    start = time.time()
     main()
+    print(f"Execution time: {round(time.time() - start, 2)} seconds")
+    plt.show()
