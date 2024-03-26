@@ -1,7 +1,7 @@
 from inputParams import parameters
 from math import pow, sqrt
 import time
-import helpers as help
+import helpers
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -26,13 +26,8 @@ def main():
         Y.append(newY)
 
     # plot X and Y values
-    plt.plot(X, Y, lw=3, color="tab:blue")
-    plt.title("Simulated y(x) curve from kinematic equations")
-    plt.ylim(0, y0+1)
-    plt.xlim(0, help.xAxis(X, Y) + 1)
-    plt.xlabel("x (m)")
-    plt.ylabel("y (m)")
-    plt.grid("both")
+    helpers.create_plot("simulated", X, Y)
+    
 
 # t-notation is used because y'(x) can be written in terms of time with kinematic equations
 def yprime(t):
@@ -62,6 +57,10 @@ def newPoint(i, t):
 
 if __name__ == "__main__":
     start = time.time()
-    main()
-    print(f"Execution time: {round(time.time() - start, 2)} seconds")
+    try:
+        main()
+        print(f"Execution time: {round(time.time() - start, 2)} seconds")
+    except Exception as e:
+        exit(f"An error occured: {e}. Physically impossible initial conditions "
+             "may cause some equations to break down. Try different initial conditions.")
     plt.show()

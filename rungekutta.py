@@ -1,7 +1,7 @@
 from inputParams import parameters
 from math import pow, sqrt
 from sys import exit
-import helpers as help
+import helpers
 import time
 import matplotlib.pyplot as plt
 import numpy as np
@@ -33,15 +33,8 @@ def main():
         Y.append(new_Y)
 
     # plot curve of values X and Y
-    plt.plot(X, Y, lw=3, color="tab:red")
-    plt.title("Runge-Kutta 4 y(x) curve")
-    plt.xlabel("x (m)")
-    plt.ylabel("y (m)")
-    plt.ylim(0, y0+1)
-    try:  plt.xlim(0, help.xAxis(X, Y) + 1)
-    except: plt.xlim(0, xmax + 1) 
-    plt.grid("both")
-
+    helpers.create_plot("RK4", X, Y)
+    
 
 # right-hand side of the autonomous differential equation
 def func(u, y_i):
