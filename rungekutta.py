@@ -2,7 +2,6 @@ from inputParams import parameters
 from math import pow, sqrt
 from sys import exit, argv
 from helpers import create_plot, create_hodograph, Uprime, hodograph_inputs
-import hodograph
 import time
 import matplotlib.pyplot as plt
 import numpy as np
