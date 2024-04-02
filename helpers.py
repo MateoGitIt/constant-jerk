@@ -44,7 +44,7 @@ def create_plot(type, ax, X, Y):
 
 
 # hodograph
-def create_hodograph(type, ax, X, Y, y_slopes=None, frame_num=100, pause_length=0.1):
+def create_hodograph(type, hodo_type, ax, X, Y, y_slopes=None, frame_num=100, pause_length=0.1):
 
     # Create one origin (x, y) for the vector in each frame
     X_origins = X[::round(len(X) / frame_num)]
@@ -54,8 +54,13 @@ def create_hodograph(type, ax, X, Y, y_slopes=None, frame_num=100, pause_length=
         ax.clear()
         create_plot(type, ax, X, Y) # replot in each frame
         if Y_origins[i] > 0:
-            ax.quiver(X_origins[i], Y_origins[i], uniform(0, 0.5), uniform(0, 0.5), 
-                   angles="xy", scale_units="xy", scale=1)
+            x_comp = uniform(0, 0.5)
+            y_comp = uniform(0, 0.5)
+            ax.quiver(X_origins[i], Y_origins[i], x_comp, y_comp, 
+                    angles="xy", scale_units="xy", scale=1)
+            if hodo_type == "hodograph_comp":
+                ax.quiver(X_origins[i], Y_origins[i], x_comp, 0, angles="xy", scale_units="xy", scale=1)
+                ax.quiver(X_origins[i], Y_origins[i], 0, y_comp, angles="xy", scale_units="xy", scale=1)
         else: break
         plt.pause(pause_length)
     plt.show()

@@ -6,6 +6,12 @@ import time
 import matplotlib.pyplot as plt
 import numpy as np
 
+"""
+
+COMMAND-LINE USE: python simulated.py [hodograph] [frame_number] [pause_length]
+
+"""
+
 # unpack inputs from "inputParams.py"
 Jt, Jf, Q, g, a0, v0, y0, xmax, tmax, h, dt = parameters.values()
 
@@ -23,7 +29,7 @@ hodo = False
 frame_num = -1
 pause_length = -1
 
-if len(argv) == 4 and argv[1] == "hodograph":
+if len(argv) == 4 and (argv[1] == "hodograph" or argv[1] == "hodograph_comp"):
     hodo = True
     frame_num, pause_length = hodograph_inputs(argv[2], argv[3])
 
@@ -73,7 +79,7 @@ if __name__ == "__main__":
         
     # create plot
     fig, ax = plt.subplots(1, 1)
-    if hodo: create_hodograph("simulated", ax, X, Y, frame_num=frame_num, pause_length=pause_length)
+    if hodo: create_hodograph("simulated", argv[1], ax, X, Y, frame_num=frame_num, pause_length=pause_length)
     else: 
         create_plot("simulated", ax, X, Y)
         plt.show()
