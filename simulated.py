@@ -1,7 +1,8 @@
 from inputParams import parameters
 from math import pow, sqrt
+from sys import exit
+from helpers import create_plot
 import time
-import helpers
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -24,9 +25,6 @@ def main():
         newX, newY = newPoint(i, t[i-1])
         X.append(newX)
         Y.append(newY)
-
-    # plot X and Y values
-    helpers.create_plot("simulated", X, Y)
     
 
 # t-notation is used because y'(x) can be written in terms of time with kinematic equations
@@ -63,4 +61,6 @@ if __name__ == "__main__":
     except Exception as e:
         exit(f"An error occured: {e}. Physically impossible initial conditions "
              "may cause some equations to break down. Try different initial conditions.")
-    plt.show()
+        
+    # create plot
+    create_plot("simulated", X, Y)
