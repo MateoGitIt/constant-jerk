@@ -7,53 +7,58 @@ the primary scripts rungekutta.py and simulation.py.
 
 from inputParams import parameters
 from math import sqrt, pow, isclose
-from random import randint
+from random import uniform
 import matplotlib.pyplot as plt
 
 # unpack inputs from "inputParams.py"
 Jt, Jf, Q, g, a0, v0, y0, xmax, tmax, h, dt = parameters.values()
 
+
+# verify inputs for hodograph
+def hodograph_inputs(frame_num, pause_length):
+
+    if type(int(frame_num)) != int:
+        exit("Number of frames (third CLA) must be an integer value.")
+    if type(float(pause_length)) != float or float(pause_length) >= 1:
+        exit("Pause length (fourth CLA) must be floating-point value less than 1.")
+    
+    return int(frame_num), float(pause_length)
+
+
 # y(x) plot features
-def create_plot(type, X, Y, y_slopes=None, hodograph=False, frames=0, pause=0):
+def create_plot(type, ax, X, Y):
 
-    fig, ax = plt.subplots(1, 1)
+    # set features and plot X, Y values
+    if type == "RK4":
+        plt.plot(X, Y, lw=3, color="tab:red")
+        plt.title("Runge-Kutta 4 y(x) curve")
+    elif type == "simulated":
+        plt.plot(X, Y, lw=3, color="tab:blue")
+        plt.title("Simulated y(x) curve from kinematic equations")
 
-    if hodograph:
-        create_hodograph(X, Y, y_slopes, ax, frames, pause)
-    else:
-        if type == "RK4":
-            plt.plot(X, Y, lw=3, color="tab:red")
-            plt.title("Runge-Kutta 4 y(x) curve")
-        elif type == "simulated":
-            plt.plot(X, Y, lw=3, color="tab:blue")
-            plt.title("Simulated y(x) curve from kinematic equations")
-
-        ax.set_xlabel("x (m)")
-        ax.set_ylabel("y (m)")
-        ax.set_ylim(0, y0+1)
-        ax.set_xlim(0, xAxis(X, Y))
-        ax.grid("both")
-        plt.show()
+    ax.set_xlabel("x (m)")
+    ax.set_ylabel("y (m)")
+    ax.set_ylim(0, y0+1)
+    ax.set_xlim(0, xAxis(X, Y))
+    ax.grid("both")
 
 
 # hodograph
-def create_hodograph(X, Y, U, ax, frame_num, pause_length):
+def create_hodograph(type, ax, X, Y, y_slopes=None, frame_num=100, pause_length=0.1):
 
+    # Create one origin (x, y) for the vector in each frame
     X_origins = X[::round(len(X) / frame_num)]
     Y_origins = Y[::round(len(Y) / frame_num)]
 
-    """
-    Map X-origins to U(x) values. This approach may work because the x and y components of jerk depend on the slope of y(x) at each X_i value.
-    Depending on frame_num, different X values will be used as origin, so it's better to map all the existing X values to U values
-    for safety.
-    """
-    
     for i in range(frame_num):
         ax.clear()
-        create_plot("RK4", X, Y, ax) # you gotta replot X and Y values in every frame
-        ax.quiver(X_origins[i], Y_origins[i], randint(5, 10), randint(5, 10), 
+        create_plot(type, ax, X, Y) # replot in each frame
+        if Y_origins[i] > 0:
+            ax.quiver(X_origins[i], Y_origins[i], uniform(0, 0.5), uniform(0, 0.5), 
                    angles="xy", scale_units="xy", scale=1)
-        plt.pause(1)
+        else: break
+        plt.pause(pause_length)
+    plt.show()
 
 
 # right-hand side of the autonomous differential equation for y''(x) = U'(x)

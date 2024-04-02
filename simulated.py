@@ -63,4 +63,5 @@ if __name__ == "__main__":
              "may cause some equations to break down. Try different initial conditions.")
         
     # create plot
-    create_plot("simulated", X, Y)
+    fig, ax = plt.subplots(1, 1)
+    create_plot("simulated", ax, X, Y)

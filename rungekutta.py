@@ -1,11 +1,17 @@
 from inputParams import parameters
 from math import pow, sqrt
 from sys import exit, argv
-from helpers import create_plot, Uprime
+from helpers import create_plot, create_hodograph, Uprime, hodograph_inputs
 import hodograph
 import time
 import matplotlib.pyplot as plt
 import numpy as np
+
+"""
+
+COMMAND-LINE USE: python rungekutta.py [hodograph] [frame_number] [pause_length]
+
+"""
 
 # unpack inputs from "inputParams.py"
 Jt, Jf, Q, g, a0, v0, y0, xmax, tmax, h, dt = parameters.values()
@@ -16,10 +22,14 @@ Y = []
 X = np.linspace(0, xmax, int(xmax / h)) 
 X = X.tolist()
 
-# hodograph (true/false)
+# hodograph inputs
 hodo = False
-if len(argv) == 2 and argv[1] == "hodograph":
+frame_num = -1
+pause_length = -1
+
+if len(argv) == 4 and argv[1] == "hodograph":
     hodo = True
+    frame_num, pause_length = hodograph_inputs(argv[2], argv[3])
 
 # append initial height
 Y.append(y0)
@@ -60,5 +70,8 @@ if __name__ == "__main__":
     print(f"RK4 execution time: {round(time.time() - start, 2)} seconds")
 
     # create plot
-    if hodo: create_plot("RK4", X, Y, y_slopes=U, hodograph=True, frames=1000, pause=0.1)
-    else: create_plot("RK4", X, Y, hodograph=False)
+    fig, ax = plt.subplots(1, 1)
+    if hodo: create_hodograph("RK4", ax, X, Y, frame_num=frame_num, pause_length=pause_length)
+    else: 
+        create_plot("RK4", ax, X, Y)
+        plt.show()
