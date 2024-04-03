@@ -30,10 +30,10 @@ def create_plot(type, ax, X, Y):
 
     # set features and plot X, Y values
     if type == "RK4":
-        plt.plot(X, Y, lw=3, color="tab:red")
+        plt.plot(X, Y, lw=2, color="tab:red")
         plt.title("Runge-Kutta 4 y(x) curve")
     elif type == "simulated":
-        plt.plot(X, Y, lw=3, color="tab:blue")
+        plt.plot(X, Y, lw=2, color="tab:blue")
         plt.title("Simulated y(x) curve from kinematic equations")
 
     ax.set_xlabel("x (m)")
@@ -56,11 +56,13 @@ def create_hodograph(type, hodo_type, ax, X, Y, y_slopes=None, frame_num=100, pa
         if Y_origins[i] > 0:
             x_comp = uniform(0, 0.5)
             y_comp = uniform(0, 0.5)
-            ax.quiver(X_origins[i], Y_origins[i], x_comp, y_comp, 
-                    angles="xy", scale_units="xy", scale=1)
+            ax.quiver(X_origins[i], Y_origins[i], x_comp, y_comp, headaxislength=3, headlength=3.5,
+                    color="red", angles="xy", scale_units="xy", scale=1)
             if hodo_type == "hodograph_comp":
-                ax.quiver(X_origins[i], Y_origins[i], x_comp, 0, angles="xy", scale_units="xy", scale=1)
-                ax.quiver(X_origins[i], Y_origins[i], 0, y_comp, angles="xy", scale_units="xy", scale=1)
+                ax.quiver(X_origins[i], Y_origins[i], x_comp, 0, headaxislength=2, headlength=2, 
+                          angles="xy", scale_units="xy", scale=1)
+                ax.quiver(X_origins[i], Y_origins[i], 0, y_comp, headaxislength=2, headlength=2, 
+                          angles="xy", scale_units="xy", scale=1)
         else: break
         plt.pause(pause_length)
     plt.show()
