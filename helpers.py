@@ -14,15 +14,20 @@ import matplotlib.pyplot as plt
 Jt, Jf, Q, g, a0, v0, y0, xmax, tmax, h, dt = parameters.values()
 
 
-# verify inputs for hodograph
-def hodograph_inputs(frame_num, pause_length):
+def accel_xcomp(test):
+    return test
 
-    if type(int(frame_num)) != int:
-        exit("Number of frames (third CLA) must be an integer value.")
-    if type(float(pause_length)) != float or float(pause_length) >= 1:
-        exit("Pause length (fourth CLA) must be floating-point value less than 1.")
-    
-    return int(frame_num), float(pause_length)
+
+def accel_ycomp(test):
+    return test
+
+
+def accel_tancomp(test):
+    return test, test
+
+
+def accel_normcomp(test):
+    return test, test
 
 
 # y(x) plot features
@@ -42,7 +47,6 @@ def create_plot(type, ax, X, Y):
     ax.set_xlim(0, xAxis(X, Y))
     ax.grid("both")
 
-#test
 
 # hodograph
 def create_hodograph(type, hodo_type, ax, X, Y, y_slopes=None, frame_num=100, pause_length=0.1):
@@ -51,23 +55,80 @@ def create_hodograph(type, hodo_type, ax, X, Y, y_slopes=None, frame_num=100, pa
     X_origins = X[::round(len(X) / frame_num)]
     Y_origins = Y[::round(len(Y) / frame_num)]
 
+
+    # Organize functions for components of vectors
+    vector = hodo_type.split("_")
+    x_comp_funcs = {"jerk": jerk_xcomp, "accel": accel_xcomp}
+    y_comp_funcs = {"jerk": jerk_ycomp, "accel": accel_ycomp}
+
     for i in range(frame_num):
         ax.clear()
-        create_plot(type, ax, X, Y) # replot in each frame
+        create_plot(type, ax, X, Y) 
         if Y_origins[i] > 0:
-            x_comp = uniform(0, 0.5)
-            y_comp = uniform(0, 0.5)
+            x_comp = x_comp_funcs[vector[0]](uniform(0, 0.5))
+            y_comp = y_comp_funcs[vector[0]](uniform(0, 0.5))
             ax.quiver(X_origins[i], Y_origins[i], x_comp, y_comp, headaxislength=3, headlength=3.5,
                     color="red", angles="xy", scale_units="xy", scale=1)
-            if hodo_type == "hodograph_comp":
-                ax.quiver(X_origins[i], Y_origins[i], x_comp, 0, headaxislength=2, headlength=2, 
-                          angles="xy", scale_units="xy", scale=1)
-                ax.quiver(X_origins[i], Y_origins[i], 0, y_comp, headaxislength=2, headlength=2, 
-                          angles="xy", scale_units="xy", scale=1)
+            
+            # Plot additional components if requested
+            if hodo_type != "jerk" or hodo_type != "accel":
+                hodograph_components(vector, ax, X_origins[i], Y_origins[i], x_comp, y_comp)
+                
         else: break
         plt.pause(pause_length)
     plt.show()
 
+
+def hodograph_components(vector, ax, X_origin, Y_origin, x_comp, y_comp):
+
+    tan_comp_funcs = {"jerk": jerk_tancomp, "accel": accel_tancomp}
+    norm_comp_funcs = {"jerk": jerk_normcomp, "accel": accel_normcomp}
+
+    # vector = ["jerk", "comp"]
+    if len(vector) == 2:
+        ax.quiver(X_origin, Y_origin, x_comp, 0, headaxislength=2, headlength=2, 
+                  angles="xy", scale_units="xy", scale=1)
+        ax.quiver(X_origin, Y_origin, 0, y_comp, headaxislength=2, headlength=2, 
+                  angles="xy", scale_units="xy", scale=1)
+        
+    # vector = ["jerk", "tan", "norm"]
+    elif len(vector) == 3:
+
+        # compute normal and tangent vectors in terms of x and y components
+        x_tan, y_tan = tan_comp_funcs[vector[0]](uniform(0, 0.5))
+        x_norm, y_norm = norm_comp_funcs[vector[0]](uniform(0, 0.5))
+
+        # plot normal and tangent vectors
+        ax.quiver(X_origin, Y_origin, x_tan, y_tan, headaxislength=2, headlength=2, 
+                  angles="xy", scale_units="xy", scale=1)
+        ax.quiver(X_origin, Y_origin, x_norm, y_norm, headaxislength=2, headlength=2, 
+                  angles="xy", scale_units="xy", scale=1)
+
+
+# verify inputs for hodograph
+def hodograph_inputs(frame_num, pause_length):
+
+    if type(int(frame_num)) != int:
+        exit("Number of frames (third CLA) must be an integer value.")
+    if type(float(pause_length)) != float or float(pause_length) >= 1:
+        exit("Pause length (fourth CLA) must be floating-point value less than 1.")
+    
+    return int(frame_num), float(pause_length)
+
+
+def jerk_xcomp(test):
+    return test
+
+
+def jerk_ycomp(test):
+    return test
+
+
+def jerk_tancomp(test):
+    return test, test
+
+def jerk_normcomp(test):
+    return test, test
 
 # right-hand side of the autonomous differential equation for y''(x) = U'(x)
 def Uprime(u, y_i):

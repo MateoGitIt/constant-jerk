@@ -8,7 +8,7 @@ import numpy as np
 
 """
 
-COMMAND-LINE USE: python rungekutta.py [hodograph/hodograph_comp] [frame_number] [pause_length]
+COMMAND-LINE USE: python rungekutta.py [vector] [frame number] [pause length]
 
 """
 
@@ -26,7 +26,7 @@ hodo = False
 frame_num = -1
 pause_length = -1
 
-if len(argv) == 4 and (argv[1] == "hodograph" or argv[1] == "hodograph_comp"):
+if len(argv) == 4 and (argv[1] in ["jerk", "accel"] or argv[1] in ["jerk_comp", "jerk_tan_norm", "accel_comp", "accel_tan_norm"]):
     hodo = True
     frame_num, pause_length = hodograph_inputs(argv[2], argv[3])
 
@@ -70,7 +70,9 @@ if __name__ == "__main__":
 
     # create plot
     fig, ax = plt.subplots(1, 1)
-    if hodo: create_hodograph("RK4", argv[1], ax, X, Y, frame_num=frame_num, pause_length=pause_length)
+    if hodo: 
+        fig.canvas.mpl_connect("close_event", exit)
+        create_hodograph("RK4", argv[1], ax, X, Y, frame_num=frame_num, pause_length=pause_length)
     else: 
         create_plot("RK4", ax, X, Y)
         plt.show()

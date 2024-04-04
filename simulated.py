@@ -29,9 +29,10 @@ hodo = False
 frame_num = -1
 pause_length = -1
 
-if len(argv) == 4 and (argv[1] == "hodograph" or argv[1] == "hodograph_comp"):
+if len(argv) == 4 and (argv[1] in ["jerk", "accel"] or argv[1] in ["jerk_comp", "jerk_tan_norm", "accel_comp", "accel_tan_norm"]):
     hodo = True
     frame_num, pause_length = hodograph_inputs(argv[2], argv[3])
+
 
 def main():
     
@@ -79,6 +80,7 @@ if __name__ == "__main__":
         
     # create plot
     fig, ax = plt.subplots(1, 1)
+    fig.canvas.mpl_connect("close_event", exit)
     if hodo: create_hodograph("simulated", argv[1], ax, X, Y, frame_num=frame_num, pause_length=pause_length)
     else: 
         create_plot("simulated", ax, X, Y)
