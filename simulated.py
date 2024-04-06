@@ -8,7 +8,7 @@ import numpy as np
 
 """
 
-COMMAND-LINE USE: python simulated.py [hodograph] [frame_number] [pause_length]
+COMMAND-LINE USE: python simulated.py [vector] [frame_number] [pause_length]
 
 """
 

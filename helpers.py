@@ -31,7 +31,7 @@ def accel_normcomp(test):
 
 
 # y(x) plot features
-def create_plot(type, ax, X, Y):
+def create_plot(type, ax, X, Y, view=False, bounds=[]):
 
     # set features and plot X, Y values
     if type == "RK4":
@@ -41,10 +41,18 @@ def create_plot(type, ax, X, Y):
         plt.plot(X, Y, lw=2, color="tab:blue")
         plt.title("Simulated y(x) curve from kinematic equations")
 
-    ax.set_xlabel("x (m)")
-    ax.set_ylabel("y (m)")
-    ax.set_ylim(0, y0+1)
-    ax.set_xlim(0, xAxis(X, Y))
+    if view: 
+        ax.set_xlim(bounds[0], bounds[1])
+        ax.set_ylim(bounds[2], bounds[3])
+        ax.spines['bottom'].set_position('zero')
+        ax.spines['left'].set_position('zero')
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+    else:
+        ax.set_xlabel("x (m)")
+        ax.set_ylabel("y (m)")
+        ax.set_ylim(0, y0+1)
+        ax.set_xlim(0, xAxis(X, Y))
     ax.grid("both")
 
 
@@ -55,8 +63,11 @@ def create_hodograph(type, hodo_type, ax, X, Y, y_slopes=None, frame_num=100, pa
     X_origins = X[::round(len(X) / frame_num)]
     Y_origins = Y[::round(len(Y) / frame_num)]
 
+    """
+    For better design, the functions for the x, y, tangent, and normal components of different vectors are mapped to different inputs the user may
+    provide. To call these functions, the user's input is used as the dictionary's key. 
+    """
 
-    # Organize functions for components of vectors
     vector = hodo_type.split("_")
     x_comp_funcs = {"jerk": jerk_xcomp, "accel": accel_xcomp}
     y_comp_funcs = {"jerk": jerk_ycomp, "accel": accel_ycomp}
@@ -65,6 +76,8 @@ def create_hodograph(type, hodo_type, ax, X, Y, y_slopes=None, frame_num=100, pa
         ax.clear()
         create_plot(type, ax, X, Y) 
         if Y_origins[i] > 0:
+
+            # compute x and y components to plot total vector
             x_comp = x_comp_funcs[vector[0]](uniform(0, 0.5))
             y_comp = y_comp_funcs[vector[0]](uniform(0, 0.5))
             ax.quiver(X_origins[i], Y_origins[i], x_comp, y_comp, headaxislength=3, headlength=3.5,
@@ -81,17 +94,18 @@ def create_hodograph(type, hodo_type, ax, X, Y, y_slopes=None, frame_num=100, pa
 
 def hodograph_components(vector, ax, X_origin, Y_origin, x_comp, y_comp):
 
+    # map user input to component functions
     tan_comp_funcs = {"jerk": jerk_tancomp, "accel": accel_tancomp}
     norm_comp_funcs = {"jerk": jerk_normcomp, "accel": accel_normcomp}
 
-    # vector = ["jerk", "comp"]
+    # if vector = ["jerk", "comp"]
     if len(vector) == 2:
         ax.quiver(X_origin, Y_origin, x_comp, 0, headaxislength=2, headlength=2, 
                   angles="xy", scale_units="xy", scale=1)
         ax.quiver(X_origin, Y_origin, 0, y_comp, headaxislength=2, headlength=2, 
                   angles="xy", scale_units="xy", scale=1)
         
-    # vector = ["jerk", "tan", "norm"]
+    # if vector = ["jerk", "tan", "norm"]
     elif len(vector) == 3:
 
         # compute normal and tangent vectors in terms of x and y components

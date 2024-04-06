@@ -21,6 +21,14 @@ Y = []
 X = np.linspace(0, xmax, int(xmax / h)) 
 X = X.tolist()
 
+# macroscopic view option
+view = False
+bounds = []
+if len(argv) == 3 and argv[1] == "view":
+    view = True
+    bounds = argv[2].split(",")
+    bounds = [int(x) for x in bounds]
+
 # hodograph inputs
 hodo = False
 frame_num = -1
@@ -34,7 +42,11 @@ if len(argv) == 4 and (argv[1] in ["jerk", "accel"] or argv[1] in ["jerk_comp", 
 Y.append(y0)
 
 # calculate U0 (which equals y'(x) at t = 0) and append to U array
-U0 = -1 * (a0/g) / sqrt(1 - pow(a0/g, 2))
+try:
+    U0 = -1 * (a0/g) / sqrt(1 - pow(a0/g, 2))
+except Exception as e:
+        exit(f"An error occured: {e}. Physically impossible initial conditions "
+             "may cause some equations to break down. Try different initial conditions.")
 U.append(U0)
 
 def main():
@@ -74,5 +86,5 @@ if __name__ == "__main__":
         fig.canvas.mpl_connect("close_event", exit)
         create_hodograph("RK4", argv[1], ax, X, Y, frame_num=frame_num, pause_length=pause_length)
     else: 
-        create_plot("RK4", ax, X, Y)
+        create_plot("RK4", ax, X, Y, view=view, bounds=bounds)
         plt.show()
