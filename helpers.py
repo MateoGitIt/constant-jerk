@@ -8,26 +8,11 @@ the primary scripts rungekutta.py and simulation.py.
 from inputParams import parameters
 from math import sqrt, pow, isclose
 from random import uniform
+import components as com
 import matplotlib.pyplot as plt
 
 # unpack inputs from "inputParams.py"
 Jt, Jf, Q, g, a0, v0, y0, xmax, tmax, h, dt = parameters.values()
-
-
-def accel_xcomp(test):
-    return test
-
-
-def accel_ycomp(test):
-    return test
-
-
-def accel_tancomp(test):
-    return test, test
-
-
-def accel_normcomp(test):
-    return test, test
 
 
 # y(x) plot features
@@ -69,8 +54,8 @@ def create_hodograph(type, hodo_type, ax, X, Y, y_slopes=None, frame_num=100, pa
     """
 
     vector = hodo_type.split("_")
-    x_comp_funcs = {"jerk": jerk_xcomp, "accel": accel_xcomp}
-    y_comp_funcs = {"jerk": jerk_ycomp, "accel": accel_ycomp}
+    x_comp_funcs = {"jerk": com.jerk_xcomp, "accel": com.accel_xcomp}
+    y_comp_funcs = {"jerk": com.jerk_ycomp, "accel": com.accel_ycomp}
 
     for i in range(frame_num):
         ax.clear()
@@ -78,8 +63,8 @@ def create_hodograph(type, hodo_type, ax, X, Y, y_slopes=None, frame_num=100, pa
         if Y_origins[i] > 0:
 
             # compute x and y components to plot total vector
-            x_comp = x_comp_funcs[vector[0]](uniform(0, 0.5))
-            y_comp = y_comp_funcs[vector[0]](uniform(0, 0.5))
+            x_comp = x_comp_funcs[vector[0]](uniform(1, 3))
+            y_comp = y_comp_funcs[vector[0]](uniform(1, 3))
             ax.quiver(X_origins[i], Y_origins[i], x_comp, y_comp, headaxislength=3, headlength=3.5,
                     color="red", angles="xy", scale_units="xy", scale=1)
             
@@ -95,8 +80,8 @@ def create_hodograph(type, hodo_type, ax, X, Y, y_slopes=None, frame_num=100, pa
 def hodograph_components(vector, ax, X_origin, Y_origin, x_comp, y_comp):
 
     # map user input to component functions
-    tan_comp_funcs = {"jerk": jerk_tancomp, "accel": accel_tancomp}
-    norm_comp_funcs = {"jerk": jerk_normcomp, "accel": accel_normcomp}
+    tan_comp_funcs = {"jerk": com.jerk_tancomp, "accel": com.accel_tancomp}
+    norm_comp_funcs = {"jerk": com.jerk_normcomp, "accel": com.accel_normcomp}
 
     # if vector = ["jerk", "comp"]
     if len(vector) == 2:
@@ -109,8 +94,8 @@ def hodograph_components(vector, ax, X_origin, Y_origin, x_comp, y_comp):
     elif len(vector) == 3:
 
         # compute normal and tangent vectors in terms of x and y components
-        x_tan, y_tan = tan_comp_funcs[vector[0]](uniform(0, 0.5))
-        x_norm, y_norm = norm_comp_funcs[vector[0]](uniform(0, 0.5))
+        x_tan, y_tan = tan_comp_funcs[vector[0]](uniform(1, 3))
+        x_norm, y_norm = norm_comp_funcs[vector[0]](uniform(1, 3))
 
         # plot normal and tangent vectors
         ax.quiver(X_origin, Y_origin, x_tan, y_tan, headaxislength=2, headlength=2, 
@@ -120,29 +105,22 @@ def hodograph_components(vector, ax, X_origin, Y_origin, x_comp, y_comp):
 
 
 # verify inputs for hodograph
-def hodograph_inputs(frame_num, pause_length):
+def hodograph_inputs(argv):
 
-    if type(int(frame_num)) != int:
-        exit("Number of frames (third CLA) must be an integer value.")
-    if type(float(pause_length)) != float or float(pause_length) >= 1:
-        exit("Pause length (fourth CLA) must be floating-point value less than 1.")
+    if argv[1] not in ["jerk", "jerk_comp", "jerk_tan_norm", "accel", "accel_comp", "accel_tan_norm"]:
+        exit("To display a hodograph, you must select one of the following as the second CLA: " 
+             "'jerk', 'jerk_comp', 'jerk_tan_norm', 'accel', 'accel_comp', or 'accel_tan_norm'. ")
+    try:
+        int(argv[2])
+        float(argv[3])
+    except:
+        exit("One of your inputs for the number of frames or pause length is invalid.")
     
-    return int(frame_num), float(pause_length)
+    if float(argv[3]) >= 1:
+            exit("Pause length (fourth CLA) must be floating-point value less than 1.")
 
+    return True, int(argv[2]), float(argv[3])
 
-def jerk_xcomp(test):
-    return test
-
-
-def jerk_ycomp(test):
-    return test
-
-
-def jerk_tancomp(test):
-    return test, test
-
-def jerk_normcomp(test):
-    return test, test
 
 # right-hand side of the autonomous differential equation for y''(x) = U'(x)
 def Uprime(u, y_i):
@@ -157,6 +135,17 @@ def Uprime(u, y_i):
 def veloc(u, y_i):
     second_term = 2 * g * (y0 - (y_i +(u*h))) / Q
     return sqrt(pow(v0, 2) + second_term)
+
+
+def view_inputs(argv):
+
+    bounds = argv[2].split(",")
+    bounds = [int(x) for x in bounds]
+    if bounds[0] < bounds[1] and bounds[2] < bounds[3]:
+        return bounds, True
+    else:
+        exit("Bounds are incorrect. Accepted format is x1,x2,y1,y2 where\ x1 and x2 must "
+             "be less than y1 and y2, respectively.")
 
 
 # adaptive x-axis for better plot style

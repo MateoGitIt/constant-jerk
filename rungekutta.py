@@ -1,7 +1,7 @@
 from inputParams import parameters
 from math import pow, sqrt
 from sys import exit, argv
-from helpers import create_plot, create_hodograph, Uprime, hodograph_inputs
+from helpers import create_plot, create_hodograph, Uprime, hodograph_inputs, view_inputs
 import time
 import matplotlib.pyplot as plt
 import numpy as np
@@ -21,22 +21,19 @@ Y = []
 X = np.linspace(0, xmax, int(xmax / h)) 
 X = X.tolist()
 
-# macroscopic view option
+# INPUT: macroscopic view option
 view = False
 bounds = []
 if len(argv) == 3 and argv[1] == "view":
-    view = True
-    bounds = argv[2].split(",")
-    bounds = [int(x) for x in bounds]
+    bounds, view = view_inputs(argv)
 
-# hodograph inputs
+if len(argv) == 3 and argv[1] in ["parabola"]:
+    pass
+
+# INPUT: hodograph
 hodo = False
-frame_num = -1
-pause_length = -1
-
-if len(argv) == 4 and (argv[1] in ["jerk", "accel"] or argv[1] in ["jerk_comp", "jerk_tan_norm", "accel_comp", "accel_tan_norm"]):
-    hodo = True
-    frame_num, pause_length = hodograph_inputs(argv[2], argv[3])
+if len(argv) == 4:
+    hodo, frame_num, pause_length = hodograph_inputs(argv)
 
 # append initial height
 Y.append(y0)

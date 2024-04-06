@@ -1,7 +1,7 @@
 from inputParams import parameters
 from math import pow, sqrt
 from sys import exit, argv
-from helpers import create_plot, create_hodograph, hodograph_inputs
+from helpers import create_plot, create_hodograph, hodograph_inputs, view_inputs
 import time
 import matplotlib.pyplot as plt
 import numpy as np
@@ -24,14 +24,17 @@ t = np.linspace(0, tmax, int(tmax / dt))
 X.append(0) 
 Y.append(y0)
 
-# hodograph inputs
-hodo = False
-frame_num = -1
-pause_length = -1
 
-if len(argv) == 4 and (argv[1] in ["jerk", "accel"] or argv[1] in ["jerk_comp", "jerk_tan_norm", "accel_comp", "accel_tan_norm"]):
-    hodo = True
-    frame_num, pause_length = hodograph_inputs(argv[2], argv[3])
+# INPUT: macroscopic view option
+view = False
+bounds = []
+if len(argv) == 3 and argv[1] == "view":
+    bounds, view = view_inputs(argv)
+    
+# INPUT: hodograph
+hodo = False
+if len(argv) == 4:
+    hodo, frame_num, pause_length = hodograph_inputs(argv)
 
 
 def main():
@@ -42,6 +45,7 @@ def main():
         X.append(newX)
         Y.append(newY)
     
+    return X, Y
 
 # t-notation is used because y'(x) can be written in terms of time with kinematic equations
 def yprime(t):
