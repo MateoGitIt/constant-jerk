@@ -114,8 +114,8 @@ def hodograph_components(vector, ax, X_origin, Y_origin, x_comp, y_comp):
     elif len(vector) == 3:
 
         # compute normal and tangent vectors in terms of x and y components
-        x_tan, y_tan = tan_comp_funcs[vector[0]](uniform(1, 3))
-        x_norm, y_norm = norm_comp_funcs[vector[0]](uniform(1, 3))
+        x_tan, y_tan = tan_comp_funcs[vector[0]](uniform(8, 11))
+        x_norm, y_norm = norm_comp_funcs[vector[0]](uniform(8, 11))
 
         # plot normal and tangent vectors
         ax.quiver(X_origin, Y_origin, x_tan, y_tan, headaxislength=2, headlength=2, 
@@ -183,8 +183,8 @@ def view_inputs(argv):
     if bounds[0] < bounds[1] and bounds[2] < bounds[3]:
         return bounds, True
     else:
-        exit("Bounds are incorrect. Accepted format is x1,x2,y1,y2 where\ x1 and x2 must "
-             "be less than y1 and y2, respectively.")
+        exit("Bounds are incorrect. Accepted format is x1,x2,y1,y2 where x1 and y1 must "
+             "be less than x2 and y2, respectively.")
 
 
 # adaptive x-axis for better plot style
@@ -197,8 +197,6 @@ def xAxis(X, Y):
     try:
         return round(Xintercept)
     except:
-
-        # return this if no Y value is near 0
         return xmax + 1
 
 

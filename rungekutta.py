@@ -2,7 +2,6 @@ from inputParams import parameters
 from math import pow, sqrt
 from sys import exit, argv
 import helpers as hel
-from helpers import model_funcs
 import time
 import matplotlib.pyplot as plt
 import numpy as np
@@ -30,7 +29,7 @@ if len(argv) == 3 and argv[1] == "view":
 
 # INPUT: best fit curve
 best_curve = False
-if (len(argv) == 3 or len(argv) == 5) and argv[1] in model_funcs:
+if (len(argv) == 3 or len(argv) == 5) and argv[1] in hel.model_funcs:
     best_curve = True
     if len(argv) == 5 and argv[3] == "view":
         bounds, view = hel.view_inputs(argv)
@@ -91,5 +90,8 @@ if __name__ == "__main__":
         hel.create_plot("RK4", ax, X, Y, view=view, bounds=bounds)
         if best_curve: 
             initial_guess = [float(x) for x in argv[2].split(",")]
-            hel.create_fit_curve(X, Y, argv[1], initial_guess, bounds[0], bounds[1])
+            if len(bounds) == 4: 
+                hel.create_fit_curve(X, Y, argv[1], initial_guess, bounds[0], bounds[1])
+            else: 
+                hel.create_fit_curve(X, Y, argv[1], initial_guess, -(xmax+round(0.15*xmax)), xmax + round(0.15*xmax))
         plt.show()

@@ -1,7 +1,7 @@
 from inputParams import parameters
 from math import pow, sqrt
 from sys import exit, argv
-from helpers import create_plot, create_hodograph, hodograph_inputs, view_inputs
+import helpers as hel
 import time
 import matplotlib.pyplot as plt
 import numpy as np
@@ -29,12 +29,19 @@ Y.append(y0)
 view = False
 bounds = []
 if len(argv) == 3 and argv[1] == "view":
-    bounds, view = view_inputs(argv)
-    
+    bounds, view = hel.view_inputs(argv)
+
+# INPUT: best fit curve
+best_curve = False
+if (len(argv) == 3 or len(argv) == 5) and argv[1] in hel.model_funcs:
+    best_curve = True
+    if len(argv) == 5 and argv[3] == "view":
+        bounds, view = hel.view_inputs(argv)
+
 # INPUT: hodograph
 hodo = False
 if len(argv) == 4:
-    hodo, frame_num, pause_length = hodograph_inputs(argv)
+    hodo, frame_num, pause_length = hel.hodograph_inputs(argv)
 
 
 def main():
@@ -85,8 +92,15 @@ if __name__ == "__main__":
 
     # create plot
     fig, ax = plt.subplots(1, 1)
-    fig.canvas.mpl_connect("close_event", exit)
-    if hodo: create_hodograph("simulated", argv[1], ax, X, Y, frame_num=frame_num, pause_length=pause_length)
+    if hodo: 
+        fig.canvas.mpl_connect("close_event", exit)
+        hel.create_hodograph("simulated", argv[1], ax, X, Y, frame_num=frame_num, pause_length=pause_length)
     else: 
-        create_plot("simulated", ax, X, Y, view=view, bounds=bounds)
-        plt.show() 
+        hel.create_plot("simulated", ax, X, Y, view=view, bounds=bounds)
+        if best_curve: 
+            initial_guess = [float(x) for x in argv[2].split(",")]
+            if len(bounds) == 4: 
+                hel.create_fit_curve(X, Y, argv[1], initial_guess, bounds[0], bounds[1])
+            else: 
+                hel.create_fit_curve(X, Y, argv[1], initial_guess, -(xmax+round(0.15*xmax)), xmax + round(0.15*xmax))
+        plt.show()
