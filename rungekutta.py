@@ -90,6 +90,6 @@ if __name__ == "__main__":
     else: 
         hel.create_plot("RK4", ax, X, Y, view=view, bounds=bounds)
         if best_curve: 
-            initial_guess = [int(x) for x in argv[2].split(",")]
-            hel.create_fit_curve(X, Y, argv[1], initial_guess)
+            initial_guess = [float(x) for x in argv[2].split(",")]
+            hel.create_fit_curve(X, Y, argv[1], initial_guess, bounds[0], bounds[1])
         plt.show()

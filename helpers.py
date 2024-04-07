@@ -9,9 +9,8 @@ from inputParams import parameters
 from math import sqrt, pow, isclose
 from random import uniform
 from scipy.optimize import curve_fit
-from sympy import init_printing, printing, symbols, simplify
 import numpy as np
-import components as com
+import components as com # type: ignore
 import matplotlib.pyplot as plt
 
 
@@ -28,10 +27,10 @@ def create_plot(type, ax, X, Y, view=False, bounds=[]):
 
     # set features and plot X, Y values
     if type == "RK4":
-        plt.plot(X, Y, lw=2, color="tab:red")
+        plt.plot(X, Y, lw=2, color="tab:red", zorder=2)
         plt.title("Runge-Kutta 4 y(x) curve")
     elif type == "simulated":
-        plt.plot(X, Y, lw=2, color="tab:blue")
+        plt.plot(X, Y, lw=2, color="tab:blue", zorder=2)
         plt.title("Simulated y(x) curve from kinematic equations")
 
     if view: 
@@ -49,16 +48,17 @@ def create_plot(type, ax, X, Y, view=False, bounds=[]):
     ax.grid("both")
 
 
-def create_fit_curve(X, Y, model, initial_guess):
+def create_fit_curve(X, Y, model, initial_guess, x1, x2):
     
     models = {"parabola": quadratic}
     popt, pcov = curve_fit(models[model], X, Y, p0=initial_guess)
+    X_reg = np.linspace(x1, x2, 100)
     if model == "parabola":
         a, b, c = popt
-        Y_reg = quadratic(np.array(X), a, b, c)
+        Y_reg = quadratic(X_reg, a, b, c)
         print_popt(model, a, b, c)
 
-    plt.plot(X, Y_reg, "--", color="black", label="Best-fit curve")
+    plt.plot(X_reg, Y_reg, "--", color="black", label="Best-fit curve", zorder=1)
 
 
 # hodograph
@@ -83,8 +83,8 @@ def create_hodograph(type, hodo_type, ax, X, Y, y_slopes=None, frame_num=100, pa
         if Y_origins[i] > 0:
 
             # compute x and y components to plot total vector
-            x_comp = x_comp_funcs[vector[0]](uniform(1, 3))
-            y_comp = y_comp_funcs[vector[0]](uniform(1, 3))
+            x_comp = x_comp_funcs[vector[0]](uniform(8, 11))
+            y_comp = y_comp_funcs[vector[0]](uniform(8, 11))
             ax.quiver(X_origins[i], Y_origins[i], x_comp, y_comp, headaxislength=3, headlength=3.5,
                     color="red", angles="xy", scale_units="xy", scale=1)
             
@@ -143,7 +143,6 @@ def hodograph_inputs(argv):
 
 
 def print_popt(model, *params):
-    init_printing()
     rounding = 3
     params = [float(round(x, rounding)) for x in params]
     print("__________________________________\n")
@@ -152,7 +151,7 @@ def print_popt(model, *params):
         a, b, c = params
         print("Best-fit parabola of the form a(x-b)^2 + c is \n\n"
              f"{(a)}(x-({b}))^2 + {c}\n\na: {a}\nb: {b}\nc: {c}\n")
-        print(f"LaTeX: {a}(x - ({b}))^{{2}} + {c}")
+        print(f"LaTeX: {a}(x-({b}))^{{2}} + {c}")
         
     print("__________________________________\n")
 

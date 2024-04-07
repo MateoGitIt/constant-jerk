@@ -11,7 +11,7 @@ tangentialJerk = 0.5
 if tangentialJerk <= 0: jerkfactor = 1
 else: jerkfactor = -1
 
-# rest of initial conditions
+# initial conditions
 factorQ = 1
 g = 9.81
 initialAcceleration = 0.1
