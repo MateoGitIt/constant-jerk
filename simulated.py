@@ -77,15 +77,16 @@ if __name__ == "__main__":
     start = time.time()
     try:
         main()
-        print(f"Execution time: {round(time.time() - start, 2)} seconds")
     except Exception as e:
         exit(f"An error occured: {e}. Physically impossible initial conditions "
              "may cause some equations to break down. Try different initial conditions.")
         
+    print(f"Kinematic simulation execution time: {round(time.time() - start, 2)} seconds")
+
     # create plot
     fig, ax = plt.subplots(1, 1)
     fig.canvas.mpl_connect("close_event", exit)
     if hodo: create_hodograph("simulated", argv[1], ax, X, Y, frame_num=frame_num, pause_length=pause_length)
     else: 
-        create_plot("simulated", ax, X, Y)
-        plt.show()
+        create_plot("simulated", ax, X, Y, view=view, bounds=bounds)
+        plt.show() 

@@ -1,7 +1,8 @@
 from inputParams import parameters
 from math import pow, sqrt
 from sys import exit, argv
-from helpers import create_plot, create_hodograph, Uprime, hodograph_inputs, view_inputs
+import helpers as hel
+from helpers import model_funcs
 import time
 import matplotlib.pyplot as plt
 import numpy as np
@@ -25,15 +26,19 @@ X = X.tolist()
 view = False
 bounds = []
 if len(argv) == 3 and argv[1] == "view":
-    bounds, view = view_inputs(argv)
+    bounds, view = hel.view_inputs(argv)
 
-if len(argv) == 3 and argv[1] in ["parabola"]:
-    pass
+# INPUT: best fit curve
+best_curve = False
+if (len(argv) == 3 or len(argv) == 5) and argv[1] in model_funcs:
+    best_curve = True
+    if len(argv) == 5 and argv[3] == "view":
+        bounds, view = hel.view_inputs(argv)
 
 # INPUT: hodograph
 hodo = False
 if len(argv) == 4:
-    hodo, frame_num, pause_length = hodograph_inputs(argv)
+    hodo, frame_num, pause_length = hel.hodograph_inputs(argv)
 
 # append initial height
 Y.append(y0)
@@ -60,10 +65,10 @@ def main():
 
 
 def rungekutta_kvalues(u, y_i):
-    k1 = Uprime(u, y_i)
-    k2 = Uprime(u + (h * (k1/2)), y_i)
-    k3 = Uprime(u + (h * (k2/2)), y_i)
-    k4 = Uprime(u + (h * k3), y_i)
+    k1 = hel.Uprime(u, y_i)
+    k2 = hel.Uprime(u + (h * (k1/2)), y_i)
+    k3 = hel.Uprime(u + (h * (k2/2)), y_i)
+    k4 = hel.Uprime(u + (h * k3), y_i)
     return k1, k2, k3, k4
 
 
@@ -81,7 +86,10 @@ if __name__ == "__main__":
     fig, ax = plt.subplots(1, 1)
     if hodo: 
         fig.canvas.mpl_connect("close_event", exit)
-        create_hodograph("RK4", argv[1], ax, X, Y, frame_num=frame_num, pause_length=pause_length)
+        hel.create_hodograph("RK4", argv[1], ax, X, Y, frame_num=frame_num, pause_length=pause_length)
     else: 
-        create_plot("RK4", ax, X, Y, view=view, bounds=bounds)
+        hel.create_plot("RK4", ax, X, Y, view=view, bounds=bounds)
+        if best_curve: 
+            initial_guess = [int(x) for x in argv[2].split(",")]
+            hel.create_fit_curve(X, Y, argv[1], initial_guess)
         plt.show()

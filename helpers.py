@@ -8,11 +8,19 @@ the primary scripts rungekutta.py and simulation.py.
 from inputParams import parameters
 from math import sqrt, pow, isclose
 from random import uniform
+from scipy.optimize import curve_fit
+from sympy import init_printing, printing, symbols, simplify
+import numpy as np
 import components as com
 import matplotlib.pyplot as plt
 
+
 # unpack inputs from "inputParams.py"
 Jt, Jf, Q, g, a0, v0, y0, xmax, tmax, h, dt = parameters.values()
+
+
+# available model functions for curve fitting. Add a new model function here.
+model_funcs = ["parabola"]
 
 
 # y(x) plot features
@@ -36,9 +44,21 @@ def create_plot(type, ax, X, Y, view=False, bounds=[]):
     else:
         ax.set_xlabel("x (m)")
         ax.set_ylabel("y (m)")
-        ax.set_ylim(0, y0+1)
+        ax.set_ylim(0, y0+(round(y0/8)))
         ax.set_xlim(0, xAxis(X, Y))
     ax.grid("both")
+
+
+def create_fit_curve(X, Y, model, initial_guess):
+    
+    models = {"parabola": quadratic}
+    popt, pcov = curve_fit(models[model], X, Y, p0=initial_guess)
+    if model == "parabola":
+        a, b, c = popt
+        Y_reg = quadratic(np.array(X), a, b, c)
+        print_popt(model, a, b, c)
+
+    plt.plot(X, Y_reg, "--", color="black", label="Best-fit curve")
 
 
 # hodograph
@@ -122,6 +142,25 @@ def hodograph_inputs(argv):
     return True, int(argv[2]), float(argv[3])
 
 
+def print_popt(model, *params):
+    init_printing()
+    rounding = 3
+    params = [float(round(x, rounding)) for x in params]
+    print("__________________________________\n")
+
+    if model == "parabola":
+        a, b, c = params
+        print("Best-fit parabola of the form a(x-b)^2 + c is \n\n"
+             f"{(a)}(x-({b}))^2 + {c}\n\na: {a}\nb: {b}\nc: {c}\n")
+        print(f"LaTeX: {a}(x - ({b}))^{{2}} + {c}")
+        
+    print("__________________________________\n")
+
+
+def quadratic(x, a, b, c):
+    return a*(x - b)**2 + c
+
+
 # right-hand side of the autonomous differential equation for y''(x) = U'(x)
 def Uprime(u, y_i):
 
@@ -139,7 +178,8 @@ def veloc(u, y_i):
 
 def view_inputs(argv):
 
-    bounds = argv[2].split(",")
+    if len(argv) == 5: bounds = argv[4].split(",")
+    elif len(argv) == 3: bounds = argv[2].split(",")
     bounds = [int(x) for x in bounds]
     if bounds[0] < bounds[1] and bounds[2] < bounds[3]:
         return bounds, True
