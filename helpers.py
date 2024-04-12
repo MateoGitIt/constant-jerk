@@ -9,6 +9,9 @@ from inputParams import parameters
 from math import sqrt, pow, isclose
 from random import uniform
 from scipy.optimize import curve_fit
+from string import ascii_lowercase as alph
+import time
+import model_funcs as mf
 import numpy as np
 import components as com # type: ignore
 import matplotlib.pyplot as plt
@@ -50,15 +53,13 @@ def create_plot(type, ax, X, Y, view=False, bounds=[]):
 
 def create_fit_curve(X, Y, model, initial_guess, x1, x2):
     
-    models = {"parabola": quadratic}
-    popt, pcov = curve_fit(models[model], X, Y, p0=initial_guess)
+    start = time.time()
+    popt, pcov = curve_fit(mf.models[model], X, Y, p0=initial_guess)
     X_reg = np.linspace(x1, x2, 100)
-    if model == "parabola":
-        a, b, c = popt
-        Y_reg = quadratic(X_reg, a, b, c)
-        print_popt(model, a, b, c)
-
+    Y_reg = mf.models[model](X_reg, *popt)
     plt.plot(X_reg, Y_reg, "--", color="black", label="Best-fit curve", zorder=1)
+    print(f"Curve-fitting execution time: {round(time.time() - start, 2)} seconds")
+    print_popt(model, *popt)
 
 
 # hodograph
@@ -96,6 +97,24 @@ def create_hodograph(type, hodo_type, ax, X, Y, y_slopes=None, frame_num=100, pa
         plt.pause(pause_length)
     plt.show()
 
+
+def curve_fit_inputs(model, params):
+
+    params = [float(x) for x in params.split(",")]
+    if len(model.split("_")) == 2 and model.split("_")[1] == "poly":
+        deg = int(model.split("_")[0])
+        if deg > 10: 
+            exit(f"A {deg}-degree polynomial model is not available. You must implement it in the source code.")
+        if len(params) - 1 != deg:
+            exit(f"This polynomial takes in {deg+1} parameters, not {len(params)}.")
+    elif model == "line" and len(params) != 2:
+        exit(f"The linear model only accepts 2 initial parameters, not {len(params)}.")
+    elif model == "ellipse" and len(params) != 4:
+        exit(f"The elliptical model only accepts 4 parameters, not {len(params)}.")
+    elif model == "exponential" and len(params) != 4:
+        exit(f"The exponential model only accepts 4 parameters, not {len(params)}.")
+
+    return True
 
 def hodograph_components(vector, ax, X_origin, Y_origin, x_comp, y_comp):
 
@@ -143,21 +162,28 @@ def hodograph_inputs(argv):
 
 
 def print_popt(model, *params):
-    rounding = 3
-    params = [float(round(x, rounding)) for x in params]
+    params = [x for x in params]
     print("__________________________________\n")
 
-    if model == "parabola":
-        a, b, c = params
-        print("Best-fit parabola of the form a(x-b)^2 + c is \n\n"
-             f"{(a)}(x-({b}))^2 + {c}\n\na: {a}\nb: {b}\nc: {c}\n")
-        print(f"LaTeX: {a}(x-({b}))^{{2}} + {c}")
+    if len(model.split("_")) == 2 and model.split("_")[1] == "poly":
+        if model.split("_")[1] == "poly":
+            model_tag = f"{model.split('_')[0]}-degree polynomial"
+    elif model == "line":
+        model_tag = "y = ax + b line"
+    elif model == "ellipse":
+        model_tag = "ellipse of the form y = b * sqrt(1-[(x-c)/a]^2) + d centered at (c, d)"
+    elif model == "exponential":
+        model_tag = "exponential of the form y = a * e^(bx) + c"
+
+    print(f"Coefficients of best-fit {model_tag} are:\n")
+    for i, coef in enumerate(params):
+        print(f"{alph[i]}: {coef}")        
         
-    print("__________________________________\n")
+    print("\n__________________________________\n")
 
 
-def quadratic(x, a, b, c):
-    return a*(x - b)**2 + c
+# 1) Implement vector functions for hodograph
+# 3) Point where object diverges from the curve and follows parabolic motion
 
 
 # right-hand side of the autonomous differential equation for y''(x) = U'(x)
@@ -198,5 +224,4 @@ def xAxis(X, Y):
         return round(Xintercept)
     except:
         return xmax + 1
-
 
