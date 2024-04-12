@@ -11,27 +11,31 @@ from random import uniform
 from scipy.optimize import curve_fit
 from string import ascii_lowercase as alph
 import time
-import model_funcs as mf
 import numpy as np
-import components as com # type: ignore
 import matplotlib.pyplot as plt
+import model_funcs as mf # type: ignore
+import components as com # type: ignore
+import computations as compute # type: ignore
+
 
 
 # unpack inputs from "inputParams.py"
 Jt, Jf, Q, g, a0, v0, y0, xmax, tmax, h, dt = parameters.values()
 
 
-# available model functions for curve fitting. Add a new model function here.
-model_funcs = ["parabola"]
+def create_div_point(ax, divPoint):
+    x, y = divPoint
+    ax.scatter([x], [y], s=50, color="tab:gray", zorder=3)
 
 
 # y(x) plot features
-def create_plot(type, ax, X, Y, view=False, bounds=[]):
+def create_plot(type, ax, X, Y, view=False, bounds=[], div=(False, ())):
 
     # set features and plot X, Y values
     if type == "RK4":
         plt.plot(X, Y, lw=2, color="tab:red", zorder=2)
         plt.title("Runge-Kutta 4 y(x) curve")
+        if div[0]: create_div_point(ax, div[1])
     elif type == "simulated":
         plt.plot(X, Y, lw=2, color="tab:blue", zorder=2)
         plt.title("Simulated y(x) curve from kinematic equations")
@@ -55,7 +59,7 @@ def create_fit_curve(X, Y, model, initial_guess, x1, x2):
     
     start = time.time()
     popt, pcov = curve_fit(mf.models[model], X, Y, p0=initial_guess)
-    X_reg = np.linspace(x1, x2, 100)
+    X_reg = np.linspace(x1, x2, 10000)
     Y_reg = mf.models[model](X_reg, *popt)
     plt.plot(X_reg, Y_reg, "--", color="black", label="Best-fit curve", zorder=1)
     print(f"Curve-fitting execution time: {round(time.time() - start, 2)} seconds")
@@ -63,16 +67,11 @@ def create_fit_curve(X, Y, model, initial_guess, x1, x2):
 
 
 # hodograph
-def create_hodograph(type, hodo_type, ax, X, Y, y_slopes=None, frame_num=100, pause_length=0.1):
+def create_hodograph(type, hodo_type, ax, X, Y, frame_num=100, pause_length=0.1, div=(False, ())):
 
     # Create one origin (x, y) for the vector in each frame
     X_origins = X[::round(len(X) / frame_num)]
     Y_origins = Y[::round(len(Y) / frame_num)]
-
-    """
-    For better design, the functions for the x, y, tangent, and normal components of different vectors are mapped to different inputs the user may
-    provide. To call these functions, the user's input is used as the dictionary's key. 
-    """
 
     vector = hodo_type.split("_")
     x_comp_funcs = {"jerk": com.jerk_xcomp, "accel": com.accel_xcomp}
@@ -81,6 +80,7 @@ def create_hodograph(type, hodo_type, ax, X, Y, y_slopes=None, frame_num=100, pa
     for i in range(frame_num):
         ax.clear()
         create_plot(type, ax, X, Y) 
+        if div[0]: create_div_point(ax, div[1])
         if Y_origins[i] > 0:
 
             # compute x and y components to plot total vector
@@ -98,6 +98,7 @@ def create_hodograph(type, hodo_type, ax, X, Y, y_slopes=None, frame_num=100, pa
     plt.show()
 
 
+# verify inputs for curve-fitting
 def curve_fit_inputs(model, params):
 
     params = [float(x) for x in params.split(",")]
@@ -115,6 +116,25 @@ def curve_fit_inputs(model, params):
         exit(f"The exponential model only accepts 4 parameters, not {len(params)}.")
 
     return True
+
+
+def divergence_point(X, Y, U):
+
+    # calculate U values for every (X_i, Y_i) point
+    U_prime = list(range(len(Y)))
+    for i, u in enumerate(U):
+        U_prime[i] = compute.Uprime(u, Y[i])
+
+    # TAKE A LOOK AT x = 847 for the last curve you ran
+
+    # find (X_i, Y_i) where normal acceleration is greater than the mgcos(theta) component of gravitational acceleration 
+    for i in range(len(X)):
+        normal_accel = compute.veloc(U[i], Y[i]) / U_prime[i]
+        gravity_accel = g / sqrt(1 + pow(U[i], 2))
+        if normal_accel > gravity_accel:
+            print(f"Divergence point: ({X[i]}, {Y[i]})")
+            return X[i], Y[i]
+    return None, None
 
 def hodograph_components(vector, ax, X_origin, Y_origin, x_comp, y_comp):
 
@@ -185,22 +205,7 @@ def print_popt(model, *params):
 # 1) Implement vector functions for hodograph
 # 3) Point where object diverges from the curve and follows parabolic motion
 
-
-# right-hand side of the autonomous differential equation for y''(x) = U'(x)
-def Uprime(u, y_i):
-
-    factor1 = Jf * (1 + pow(u, 2)) / (2 * pow(veloc(u, y_i), 2))
-    radicand = pow(g/Q, 2) - (Jf * 4 * veloc(u, y_i) * Jt * (1 + pow(u, 2)))
-    factor2 = (-1 * g/Q) + sqrt(radicand)
-    return factor1 * factor2
-
-
-# Velocity as a function of y
-def veloc(u, y_i):
-    second_term = 2 * g * (y0 - (y_i +(u*h))) / Q
-    return sqrt(pow(v0, 2) + second_term)
-
-
+# verify inputs for view functionality
 def view_inputs(argv):
 
     if len(argv) == 5: bounds = argv[4].split(",")
@@ -213,7 +218,7 @@ def view_inputs(argv):
              "be less than x2 and y2, respectively.")
 
 
-# adaptive x-axis for better plot style
+# adaptive x-axis
 def xAxis(X, Y):
     
     # Find x-intercept

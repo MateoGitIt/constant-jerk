@@ -1,7 +1,8 @@
 from inputParams import parameters
 from math import pow, sqrt
 from sys import exit, argv
-from model_funcs import models
+from model_funcs import models # type: ignore
+from computations import Uprime # type: ignore
 import helpers as hel
 import time
 import matplotlib.pyplot as plt
@@ -51,7 +52,7 @@ except Exception as e:
              "may cause some equations to break down. Try different initial conditions.")
 U.append(U0)
 
-def main():
+def rungekutta_main():
 
     # calculate new U and Y values and record them in lists
     for i in range(1, len(X)):
@@ -65,30 +66,35 @@ def main():
 
 
 def rungekutta_kvalues(u, y_i):
-    k1 = hel.Uprime(u, y_i)
-    k2 = hel.Uprime(u + (h * (k1/2)), y_i)
-    k3 = hel.Uprime(u + (h * (k2/2)), y_i)
-    k4 = hel.Uprime(u + (h * k3), y_i)
+    k1 = Uprime(u, y_i)
+    k2 = Uprime(u + (h * (k1/2)), y_i)
+    k3 = Uprime(u + (h * (k2/2)), y_i)
+    k4 = Uprime(u + (h * k3), y_i)
     return k1, k2, k3, k4
 
 
 if __name__ == "__main__":
     start =  time.time()
     try:
-        main()
+        X, Y, U = rungekutta_main()
     except Exception as e:
         exit(f"An error occured: {e}. Physically impossible initial conditions "
              "may cause some equations to break down. Try different initial conditions.")
         
     print(f"RK4 execution time: {round(time.time() - start, 2)} seconds")
 
+    # divergence point between curve and object's trajectory
+    show_div = False
+    divPoint = hel.divergence_point(X, Y, U)
+    if divPoint != (None, None): show_div = True
+
     # create plot
     fig, ax = plt.subplots(1, 1)
     if hodo: 
         fig.canvas.mpl_connect("close_event", exit)
-        hel.create_hodograph("RK4", argv[1], ax, X, Y, frame_num=frame_num, pause_length=pause_length)
+        hel.create_hodograph("RK4", argv[1], ax, X, Y, frame_num=frame_num, pause_length=pause_length, div=(show_div, divPoint))
     else: 
-        hel.create_plot("RK4", ax, X, Y, view=view, bounds=bounds)
+        hel.create_plot("RK4", ax, X, Y, view=view, bounds=bounds, div=(show_div, divPoint))
         if best_curve: 
             initial_guess = [float(x) for x in argv[2].split(",")]
             if len(bounds) == 4: 

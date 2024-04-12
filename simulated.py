@@ -1,6 +1,7 @@
 from inputParams import parameters
 from math import pow, sqrt
 from sys import exit, argv
+from model_funcs import models # type: ignore
 import helpers as hel
 import time
 import matplotlib.pyplot as plt
@@ -33,8 +34,8 @@ if len(argv) == 3 and argv[1] == "view":
 
 # INPUT: best fit curve
 best_curve = False
-if (len(argv) == 3 or len(argv) == 5) and argv[1] in hel.model_funcs:
-    best_curve = True
+if (len(argv) == 3 or len(argv) == 5) and argv[1] in models:
+    best_curve = hel.curve_fit_inputs(argv[1], argv[2])
     if len(argv) == 5 and argv[3] == "view":
         bounds, view = hel.view_inputs(argv)
 
@@ -44,7 +45,7 @@ if len(argv) == 4:
     hodo, frame_num, pause_length = hel.hodograph_inputs(argv)
 
 
-def main():
+def simulated_main():
     
     # calculate X and Y values
     for i in range(1, len(t)):
@@ -83,7 +84,7 @@ def newPoint(i, t):
 if __name__ == "__main__":
     start = time.time()
     try:
-        main()
+        simulated_main()
     except Exception as e:
         exit(f"An error occured: {e}. Physically impossible initial conditions "
              "may cause some equations to break down. Try different initial conditions.")
