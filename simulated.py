@@ -89,6 +89,7 @@ if __name__ == "__main__":
         exit(f"An error occured: {e}. Physically impossible initial conditions "
              "may cause some equations to break down. Try different initial conditions.")
         
+    print()
     print(f"Kinematic simulation execution time: {round(time.time() - start, 2)} seconds")
 
     # create plot

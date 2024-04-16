@@ -6,7 +6,7 @@ the primary scripts rungekutta.py and simulation.py.
 """
 
 from inputParams import parameters
-from math import sqrt, pow, isclose
+from math import sqrt, pow, isclose, isnan
 from random import uniform
 from scipy.optimize import curve_fit
 from string import ascii_lowercase as alph
@@ -25,7 +25,7 @@ Jt, Jf, Q, g, a0, v0, y0, xmax, tmax, h, dt = parameters.values()
 
 def create_div_point(ax, divPoint):
     x, y = divPoint
-    ax.scatter([x], [y], s=50, color="tab:gray", zorder=3)
+    ax.scatter([x], [y], marker="x", s=30, color="black", zorder=3)
 
 
 # y(x) plot features
@@ -125,16 +125,25 @@ def divergence_point(X, Y, U):
     for i, u in enumerate(U):
         U_prime[i] = compute.Uprime(u, Y[i])
 
-    # TAKE A LOOK AT x = 847 for the last curve you ran
-
-    # find (X_i, Y_i) where normal acceleration is greater than the mgcos(theta) component of gravitational acceleration 
+    # find (X_i, Y_i) where normal acceleration due to gravity is less than the radial acceleration of the curvature
+    print()
     for i in range(len(X)):
-        normal_accel = compute.veloc(U[i], Y[i]) / U_prime[i]
-        gravity_accel = g / sqrt(1 + pow(U[i], 2))
-        if normal_accel > gravity_accel:
-            print(f"Divergence point: ({X[i]}, {Y[i]})")
+        veloc = compute.veloc(U[i], Y[i])
+        radial_accel = pow(veloc, 2) * (U_prime[i] / pow(sqrt(1 + pow(U[i], 2)), 3))
+        normal_gravity_accel = g / sqrt(1 + pow(U[i], 2))
+        if Jt > 0: radial_accel = abs(radial_accel) # DOUBLE CHECK THE LOGIC OF THESE SIGNS
+        elif Jt < 0 and radial_accel < 0: radial_accel = -1 * radial_accel
+        if radial_accel > normal_gravity_accel:
+            print(f"Divergence point: (x, y) = ({X[i]}, {Y[i]})")
+            print(f"Radial accel. due to curvature: {radial_accel} m/s^2")
+            print(f"Normal accel. due to gravity: {normal_gravity_accel} m/s^2")
+            print(f"Speed: {veloc} m/s")
+            print()
             return X[i], Y[i]
+    print("No divergence point exists.")
+    print()
     return None, None
+
 
 def hodograph_components(vector, ax, X_origin, Y_origin, x_comp, y_comp):
 
@@ -203,7 +212,10 @@ def print_popt(model, *params):
 
 
 # 1) Implement vector functions for hodograph
-# 3) Point where object diverges from the curve and follows parabolic motion
+# 3) Point where object diverges from the curve and follows parabolic motion. 
+"""
+640 000 km speed is reached at the end of the curve. The object definitely diverged from the surface way before.
+"""
 
 # verify inputs for view functionality
 def view_inputs(argv):
