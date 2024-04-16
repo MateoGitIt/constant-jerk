@@ -19,7 +19,9 @@ Jt, Jf, Q, g, a0, v0, y0, xmax, tmax, h, dt = parameters.values()
 # declare time, X and Y arrays
 X = []
 Y = []
-t = np.linspace(0, tmax, int(tmax / dt))
+if dt != 0:
+    t = np.linspace(0, tmax, int(tmax / dt))
+else: exit("'dt' cannot equal zero.")
 
 # append x0 and y0
 X.append(0) 

@@ -84,13 +84,13 @@ if __name__ == "__main__":
     print()
     print(f"RK4 execution time: {round(time.time() - start, 2)} seconds")
 
-    # divergence point between curve and object's trajectory
-    show_div = False
-    divPoint = hel.divergence_point(X, Y, U)
-    if divPoint != (None, None): show_div = True
-
     # create plot
     fig, ax = plt.subplots(1, 1)
+
+    # divergence point between curve and object's trajectory
+    divPoint = hel.divergence_point(ax, X, Y, U)
+    show_div = True if divPoint != (None, None) else False
+
     if hodo: 
         fig.canvas.mpl_connect("close_event", exit)
         hel.create_hodograph("RK4", argv[1], ax, X, Y, frame_num=frame_num, pause_length=pause_length, div=(show_div, divPoint))

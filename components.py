@@ -1,5 +1,6 @@
 from inputParams import parameters
-from math import sqrt, pow
+from math import sqrt, pow, sin, cos, atan
+from computations import Uprime
 
 # unpack inputs from "inputParams.py"
 Jt, Jf, Q, g, a0, v0, y0, xmax, tmax, h, dt = parameters.values()
@@ -36,3 +37,11 @@ def jerk_tancomp(test):
 
 def jerk_normcomp(test):
     return test, test
+
+
+def veloc_xcomp(u, speed):
+    return abs(speed) * cos(atan(u))
+
+
+def veloc_ycomp(u, speed):
+    return abs(speed) * sin(atan(u))

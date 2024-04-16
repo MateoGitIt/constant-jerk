@@ -6,7 +6,7 @@ the primary scripts rungekutta.py and simulation.py.
 """
 
 from inputParams import parameters
-from math import sqrt, pow, isclose, isnan
+from math import sqrt, pow, isclose
 from random import uniform
 from scipy.optimize import curve_fit
 from string import ascii_lowercase as alph
@@ -23,11 +23,6 @@ import computations as compute # type: ignore
 Jt, Jf, Q, g, a0, v0, y0, xmax, tmax, h, dt = parameters.values()
 
 
-def create_div_point(ax, divPoint):
-    x, y = divPoint
-    ax.scatter([x], [y], marker="x", s=30, color="black", zorder=3)
-
-
 # y(x) plot features
 def create_plot(type, ax, X, Y, view=False, bounds=[], div=(False, ())):
 
@@ -35,7 +30,8 @@ def create_plot(type, ax, X, Y, view=False, bounds=[], div=(False, ())):
     if type == "RK4":
         plt.plot(X, Y, lw=2, color="tab:red", zorder=2)
         plt.title("Runge-Kutta 4 y(x) curve")
-        if div[0]: create_div_point(ax, div[1])
+        if div[0]: 
+            ax.scatter([div[1][0]], [div[1][1]], marker="x", s=30, color="black", zorder=3)
     elif type == "simulated":
         plt.plot(X, Y, lw=2, color="tab:blue", zorder=2)
         plt.title("Simulated y(x) curve from kinematic equations")
@@ -56,14 +52,19 @@ def create_plot(type, ax, X, Y, view=False, bounds=[], div=(False, ())):
 
 
 def create_fit_curve(X, Y, model, initial_guess, x1, x2):
-    
     start = time.time()
+
     popt, pcov = curve_fit(mf.models[model], X, Y, p0=initial_guess)
     X_reg = np.linspace(x1, x2, 10000)
     Y_reg = mf.models[model](X_reg, *popt)
+
     plt.plot(X_reg, Y_reg, "--", color="black", label="Best-fit curve", zorder=1)
     print(f"Curve-fitting execution time: {round(time.time() - start, 2)} seconds")
     print_popt(model, *popt)
+
+
+def create_parabolic_fall(ax, X, Y):
+    ax.plot(X, Y, ".", color="gray", label="Parabolic free fall", zorder=1)
 
 
 # hodograph
@@ -80,7 +81,8 @@ def create_hodograph(type, hodo_type, ax, X, Y, frame_num=100, pause_length=0.1,
     for i in range(frame_num):
         ax.clear()
         create_plot(type, ax, X, Y) 
-        if div[0]: create_div_point(ax, div[1])
+        if div[0]: 
+            ax.scatter([div[1][0]], [div[1][1]], marker="x", s=30, color="black", zorder=3)
         if Y_origins[i] > 0:
 
             # compute x and y components to plot total vector
@@ -118,28 +120,25 @@ def curve_fit_inputs(model, params):
     return True
 
 
-def divergence_point(X, Y, U):
-
-    # calculate U values for every (X_i, Y_i) point
-    U_prime = list(range(len(Y)))
-    for i, u in enumerate(U):
-        U_prime[i] = compute.Uprime(u, Y[i])
+def divergence_point(ax, X, Y, U):
 
     # find (X_i, Y_i) where normal acceleration due to gravity is less than the radial acceleration of the curvature
     print()
     for i in range(len(X)):
         veloc = compute.veloc(U[i], Y[i])
-        radial_accel = pow(veloc, 2) * (U_prime[i] / pow(sqrt(1 + pow(U[i], 2)), 3))
+        radial_accel = pow(veloc, 2) * (compute.Uprime(U[i], Y[i]) / pow(sqrt(1 + pow(U[i], 2)), 3))
         normal_gravity_accel = g / sqrt(1 + pow(U[i], 2))
+
         if Jt > 0: radial_accel = abs(radial_accel) # DOUBLE CHECK THE LOGIC OF THESE SIGNS
         elif Jt < 0 and radial_accel < 0: radial_accel = -1 * radial_accel
+
         if radial_accel > normal_gravity_accel:
-            print(f"Divergence point: (x, y) = ({X[i]}, {Y[i]})")
-            print(f"Radial accel. due to curvature: {radial_accel} m/s^2")
-            print(f"Normal accel. due to gravity: {normal_gravity_accel} m/s^2")
-            print(f"Speed: {veloc} m/s")
-            print()
+            print_divPoint(X[i], Y[i], radial_accel, normal_gravity_accel, veloc)
+            if dt != 0: 
+                X_parabolic, Y_parabolic = compute.parabolic_free_fall((X[i], Y[i]), veloc, U[i], 1000)
+                ax.plot(X_parabolic, Y_parabolic, linestyle="dotted", color="gray", label="Parabolic free fall", zorder=1)
             return X[i], Y[i]
+        
     print("No divergence point exists.")
     print()
     return None, None
@@ -190,6 +189,14 @@ def hodograph_inputs(argv):
     return True, int(argv[2]), float(argv[3])
 
 
+def print_divPoint(x, y, radial_accel, normal_gravity_accel, veloc):
+    print(f"Divergence point: (x, y) = ({x}, {y})")
+    print(f"Radial accel. due to curvature: {radial_accel} m/s^2")
+    print(f"Normal accel. due to gravity: {normal_gravity_accel} m/s^2")
+    print(f"Speed: {veloc} m/s")
+    print()
+
+
 def print_popt(model, *params):
     params = [x for x in params]
     print("__________________________________\n")
@@ -212,16 +219,13 @@ def print_popt(model, *params):
 
 
 # 1) Implement vector functions for hodograph
-# 3) Point where object diverges from the curve and follows parabolic motion. 
-"""
-640 000 km speed is reached at the end of the curve. The object definitely diverged from the surface way before.
-"""
+
 
 # verify inputs for view functionality
 def view_inputs(argv):
-
     if len(argv) == 5: bounds = argv[4].split(",")
     elif len(argv) == 3: bounds = argv[2].split(",")
+
     bounds = [int(x) for x in bounds]
     if bounds[0] < bounds[1] and bounds[2] < bounds[3]:
         return bounds, True
