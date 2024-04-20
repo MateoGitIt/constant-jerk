@@ -7,7 +7,6 @@ the primary scripts rungekutta.py and simulation.py.
 
 from inputParams import parameters
 from math import sqrt, pow, isclose
-from random import uniform
 from scipy.optimize import curve_fit
 from string import ascii_lowercase as alph
 import time
@@ -102,26 +101,6 @@ def create_hodograph(type, hodo_type, ax, X, Y, U=[], frame_num=100, pause_lengt
     plt.show()
 
 
-# verify inputs for curve-fitting
-def curve_fit_inputs(model, params):
-
-    params = [float(x) for x in params.split(",")]
-    if len(model.split("_")) == 2 and model.split("_")[1] == "poly":
-        deg = int(model.split("_")[0])
-        if deg > 10: 
-            exit(f"A {deg}-degree polynomial model is not available. You must implement it in the source code.")
-        if len(params) - 1 != deg:
-            exit(f"This polynomial takes in {deg+1} parameters, not {len(params)}.")
-    elif model == "line" and len(params) != 2:
-        exit(f"The linear model only accepts 2 initial parameters, not {len(params)}.")
-    elif model == "ellipse" and len(params) != 4:
-        exit(f"The elliptical model only accepts 4 parameters, not {len(params)}.")
-    elif model == "exponential" and len(params) != 4:
-        exit(f"The exponential model only accepts 4 parameters, not {len(params)}.")
-
-    return True
-
-
 def divergence_point(ax, X, Y, U):
 
     # find (X_i, Y_i) where normal acceleration due to gravity is less than the radial acceleration of the curvature
@@ -173,24 +152,6 @@ def hodograph_components(vector, ax, X_origin, Y_origin, u, x_comp, y_comp):
                   angles="xy", scale_units="xy", scale=1)
 
 
-# verify inputs for hodograph
-def hodograph_inputs(argv):
-
-    if argv[1] not in ["jerk", "jerk_comp", "jerk_tan_norm", "accel", "accel_comp", "accel_tan_norm"]:
-        exit("To display a hodograph, you must select one of the following as the second CLA: " 
-             "'jerk', 'jerk_comp', 'jerk_tan_norm', 'accel', 'accel_comp', or 'accel_tan_norm'. ")
-    try:
-        int(argv[2])
-        float(argv[3])
-    except:
-        exit("One of your inputs for the number of frames or pause length is invalid.")
-    
-    if float(argv[3]) >= 1:
-            exit("Pause length (fourth CLA) must be floating-point value less than 1.")
-
-    return True, int(argv[2]), float(argv[3])
-
-
 def print_divPoint(x, y, radial_accel, normal_gravity_accel, veloc):
     print(f"Divergence point: (x, y) = ({x}, {y})")
     print(f"Radial accel. due to curvature: {radial_accel} m/s^2")
@@ -218,22 +179,6 @@ def print_popt(model, *params):
         print(f"{alph[i]}: {coef}")        
         
     print("\n__________________________________\n")
-
-
-# 1) Implement vector functions for hodograph
-
-
-# verify inputs for view functionality
-def view_inputs(argv):
-    if len(argv) == 5: bounds = argv[4].split(",")
-    elif len(argv) == 3: bounds = argv[2].split(",")
-
-    bounds = [int(x) for x in bounds]
-    if bounds[0] < bounds[1] and bounds[2] < bounds[3]:
-        return bounds, True
-    else:
-        exit("Bounds are incorrect. Accepted format is x1,x2,y1,y2 where x1 and y1 must "
-             "be less than x2 and y2, respectively.")
 
 
 # adaptive x-axis
