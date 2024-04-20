@@ -93,7 +93,7 @@ if __name__ == "__main__":
 
     if hodo: 
         fig.canvas.mpl_connect("close_event", exit)
-        hel.create_hodograph("RK4", argv[1], ax, X, Y, frame_num=frame_num, pause_length=pause_length, div=(show_div, divPoint))
+        hel.create_hodograph("RK4", argv[1], ax, X, Y, U=U, frame_num=frame_num, pause_length=pause_length, div=(show_div, divPoint))
     else: 
         hel.create_plot("RK4", ax, X, Y, view=view, bounds=bounds, div=(show_div, divPoint))
         if best_curve: 

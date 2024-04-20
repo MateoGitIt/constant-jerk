@@ -17,7 +17,8 @@ import model_funcs as mf # type: ignore
 import components as com # type: ignore
 import computations as compute # type: ignore
 
-
+# factor to scale up vectors in hodograph
+vector_scale = 10
 
 # unpack inputs from "inputParams.py"
 Jt, Jf, Q, g, a0, v0, y0, xmax, tmax, h, dt = parameters.values()
@@ -68,11 +69,12 @@ def create_parabolic_fall(ax, X, Y):
 
 
 # hodograph
-def create_hodograph(type, hodo_type, ax, X, Y, frame_num=100, pause_length=0.1, div=(False, ())):
+def create_hodograph(type, hodo_type, ax, X, Y, U=[], frame_num=100, pause_length=0.1, div=(False, ())):
 
     # Create one origin (x, y) for the vector in each frame
     X_origins = X[::round(len(X) / frame_num)]
     Y_origins = Y[::round(len(Y) / frame_num)]
+    U_origins = U[::round(len(X) / frame_num)]
 
     vector = hodo_type.split("_")
     x_comp_funcs = {"jerk": com.jerk_xcomp, "accel": com.accel_xcomp}
@@ -86,14 +88,14 @@ def create_hodograph(type, hodo_type, ax, X, Y, frame_num=100, pause_length=0.1,
         if Y_origins[i] > 0:
 
             # compute x and y components to plot total vector
-            x_comp = x_comp_funcs[vector[0]](uniform(8, 11))
-            y_comp = y_comp_funcs[vector[0]](uniform(8, 11))
+            x_comp = vector_scale * x_comp_funcs[vector[0]](U_origins[i], Y_origins[i])
+            y_comp = vector_scale * y_comp_funcs[vector[0]](U_origins[i], Y_origins[i])
             ax.quiver(X_origins[i], Y_origins[i], x_comp, y_comp, headaxislength=3, headlength=3.5,
                     color="red", angles="xy", scale_units="xy", scale=1)
             
             # Plot additional components if requested
             if hodo_type != "jerk" or hodo_type != "accel":
-                hodograph_components(vector, ax, X_origins[i], Y_origins[i], x_comp, y_comp)
+                hodograph_components(vector, ax, X_origins[i], Y_origins[i], U_origins[i], x_comp, y_comp)
                 
         else: break
         plt.pause(pause_length)
@@ -125,7 +127,7 @@ def divergence_point(ax, X, Y, U):
     # find (X_i, Y_i) where normal acceleration due to gravity is less than the radial acceleration of the curvature
     print()
     for i in range(len(X)):
-        veloc = compute.veloc(U[i], Y[i])
+        veloc = compute.speed(U[i], Y[i])
         radial_accel = pow(veloc, 2) * (compute.Uprime(U[i], Y[i]) / pow(sqrt(1 + pow(U[i], 2)), 3))
         normal_gravity_accel = g / sqrt(1 + pow(U[i], 2))
 
@@ -144,11 +146,11 @@ def divergence_point(ax, X, Y, U):
     return None, None
 
 
-def hodograph_components(vector, ax, X_origin, Y_origin, x_comp, y_comp):
+def hodograph_components(vector, ax, X_origin, Y_origin, u, x_comp, y_comp):
 
     # map user input to component functions
-    tan_comp_funcs = {"jerk": com.jerk_tancomp, "accel": com.accel_tancomp}
-    norm_comp_funcs = {"jerk": com.jerk_normcomp, "accel": com.accel_normcomp}
+    tan_comp_funcs = {"jerk": com.tangential_jerk, "accel": com.tangential_accel}
+    norm_comp_funcs = {"jerk": com.normal_jerk, "accel": com.normal_accel}
 
     # if vector = ["jerk", "comp"]
     if len(vector) == 2:
@@ -161,13 +163,13 @@ def hodograph_components(vector, ax, X_origin, Y_origin, x_comp, y_comp):
     elif len(vector) == 3:
 
         # compute normal and tangent vectors in terms of x and y components
-        x_tan, y_tan = tan_comp_funcs[vector[0]](uniform(8, 11))
-        x_norm, y_norm = norm_comp_funcs[vector[0]](uniform(8, 11))
+        x_tan, y_tan = tan_comp_funcs[vector[0]](u, Y_origin)[0]
+        x_norm, y_norm = norm_comp_funcs[vector[0]](u, Y_origin)[0]
 
         # plot normal and tangent vectors
-        ax.quiver(X_origin, Y_origin, x_tan, y_tan, headaxislength=2, headlength=2, 
+        ax.quiver(X_origin, Y_origin, vector_scale * x_tan, vector_scale * y_tan, headaxislength=2, headlength=2, 
                   angles="xy", scale_units="xy", scale=1)
-        ax.quiver(X_origin, Y_origin, x_norm, y_norm, headaxislength=2, headlength=2, 
+        ax.quiver(X_origin, Y_origin, vector_scale * x_norm, vector_scale * y_norm, headaxislength=2, headlength=2, 
                   angles="xy", scale_units="xy", scale=1)
 
 
