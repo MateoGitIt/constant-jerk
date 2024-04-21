@@ -1,8 +1,8 @@
 from inputParams import parameters
 from math import pow, sqrt, isnan
 from sys import exit, argv
-from model_funcs import models # type: ignore
-from computations import Uprime # type: ignore
+from model_funcs import models
+from computations import Uprime
 import verify_ins as verify
 import helpers as hel
 import time
@@ -109,9 +109,11 @@ if __name__ == "__main__":
 
     if hodo: 
         fig.canvas.mpl_connect("close_event", exit)
-        hel.create_hodograph("RK4", argv[1], ax, X, Y, U=U, frame_num=frame_num, pause_length=pause_length, div=(show_div, divPoint))
+        hel.create_hodograph("RK4", argv[1], ax, X, Y, U=U, frame_num=frame_num, pause_length=pause_length,
+                             div=(show_div, divPoint))
     else: 
-        hel.create_plot("RK4", ax, X, Y, view=view, bounds=bounds, div=(show_div, divPoint))
+        hel.create_plot("RK4", ax, data=[X, Y], div=(show_div, divPoint))
+        if view: hel.set_view(ax, bounds=bounds)
         if best_curve: 
             initial_guess = [float(x) for x in argv[2].split(",")]
             if len(bounds) == 4: 

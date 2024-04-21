@@ -24,31 +24,32 @@ Jt, Jf, Q, g, a0, v0, y0, xmax, tmax, h, dt = parameters.values()
 
 
 # y(x) plot features
-def create_plot(type, ax, X, Y, view=False, bounds=[], div=(False, ())):
+def create_plot(type, ax, data=[], div=(False, ())):
 
     # set features and plot X, Y values
     if type == "RK4":
-        plt.plot(X, Y, lw=2, color="tab:red", zorder=2)
+        plt.plot(data[0], data[1], lw=2, color="tab:red", zorder=2)
         plt.title("Runge-Kutta 4 y(x) curve")
         if div[0]: 
             ax.scatter([div[1][0]], [div[1][1]], marker="x", s=30, color="black", zorder=3)
     elif type == "simulated":
-        plt.plot(X, Y, lw=2, color="tab:blue", zorder=2)
+        plt.plot(data[0], data[1], lw=2, color="tab:blue", zorder=2)
         plt.title("Simulated y(x) curve from kinematic equations")
 
-    if view: 
-        ax.set_xlim(bounds[0], bounds[1])
-        ax.set_ylim(bounds[2], bounds[3])
-        ax.spines['bottom'].set_position('zero')
-        ax.spines['left'].set_position('zero')
-        ax.spines['top'].set_visible(False)
-        ax.spines['right'].set_visible(False)
-    else:
-        ax.set_xlabel("x (m)")
-        ax.set_ylabel("y (m)")
-        ax.set_ylim(0, y0+(round(y0/8)))
-        ax.set_xlim(0, xAxis(X, Y))
+    ax.set_xlabel("x (m)")
+    ax.set_ylabel("y (m)")
+    ax.set_ylim(0, y0+(round(y0/8)))
+    ax.set_xlim(0, xAxis(data[0], data[1]))
     ax.grid("both")
+
+
+def set_view(ax, bounds=[]):
+    ax.set_xlim(bounds[0], bounds[1])
+    ax.set_ylim(bounds[2], bounds[3])
+    ax.spines['bottom'].set_position('zero')
+    ax.spines['left'].set_position('zero')
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
 
 
 def create_fit_curve(X, Y, model, initial_guess, x1, x2):
