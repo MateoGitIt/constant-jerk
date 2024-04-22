@@ -43,7 +43,8 @@ def create_plot(type, ax, data=[], div=(False, ())):
     ax.grid("both")
 
 
-def set_view(ax, bounds=[]):
+def set_view(ax, bounds):
+    # if called, this function overwrites the view set by create_plot
     ax.set_xlim(bounds[0], bounds[1])
     ax.set_ylim(bounds[2], bounds[3])
     ax.spines['bottom'].set_position('zero')

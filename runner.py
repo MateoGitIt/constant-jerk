@@ -5,7 +5,9 @@ view. This "runner.py" file calls other files in this repository to achieve the 
 
 """
 
-from helpers import create_plot
+from helpers import create_plot, set_view
+from helpers_runner import verify_view_bounds
+from rungekutta import rungekutta_main
 import matplotlib.pyplot as plt
 
 # SIDE-BY SIDE PLOTS
@@ -15,6 +17,7 @@ rows = 1
 columns = 2
 fig, axs = plt.subplots(rows, columns)
 for i, ax in enumerate(axs):
+    # How to manage and receive what data the user wants to plot? First, what else could the user want to plot?
     create_plot(plots[i], ax, data=[X, Y])
 
 
@@ -36,7 +39,10 @@ frames = 100
 pause = 0.1
 
 # VIEW
-view = [-100, 100, -100, 100]
+view_bounds = [-100, 100, -100, 100]
+if verify_view_bounds(view_bounds):
+    for ax in axs:
+        set_view(ax, view_bounds)
 
 # DIVERGENCE POINT AND MOTION
 divergence_motion = True

@@ -100,7 +100,8 @@ if __name__ == "__main__":
         fig.canvas.mpl_connect("close_event", exit)
         hel.create_hodograph("simulated", argv[1], ax, X, Y, frame_num=frame_num, pause_length=pause_length)
     else: 
-        hel.create_plot("simulated", ax, X, Y, view=view, bounds=bounds)
+        hel.create_plot("simulated", ax, data=[X, Y])
+        if view: hel.set_view(ax, bounds=bounds)
         if best_curve: 
             initial_guess = [float(x) for x in argv[2].split(",")]
             if len(bounds) == 4: 
