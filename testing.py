@@ -1,25 +1,28 @@
 import matplotlib.pyplot as plt
+from random import randint
 from sys import argv
-import numpy as np
-from scipy.optimize import curve_fit
+from rungekutta import rungekutta_main
 
-params = [int(x) for x in argv[1:]]
-print(params)
+fig, axs = plt.subplots(2, 2)
 
-X = np.linspace(0, 100, 100)
-Y = np.linspace(0, 100, 100)
+X, Y, U = rungekutta_main()
+for i, ax in enumerate(axs[0]):
+    ax.plot(X, Y)
+    ax.set_title(f"Static graph {i+1}")
 
-def func1(x, *c):
-    return c[0]*x**2 + c[1]*x + c[2]
+# HODOGRAPH
+frame_num = 1000
+pause_length = 0.01
+X_origins = X[::round(len(X) / frame_num)]
+Y_origins = Y[::round(len(Y) / frame_num)]
 
-popt, pcov = curve_fit(func1, X, Y, p0=params)
-print(popt)
+for i in range(frame_num):
+    for j, ax in enumerate(axs[1]):
+        ax.clear()
+        ax.set_title(f"Hodograph {j+1}")
+        ax.plot(X, Y, color="tab:red")
+        ax.quiver(X_origins[i], Y_origins[i], randint(80, 100), randint(80, 100),headaxislength=3, headlength=3.5,
+                        color="red", angles="xy", scale_units="xy", scale=1)
+    plt.pause(pause_length)
 
-
-Y_reg = func1(X, *popt)
-
-plt.plot(X, Y_reg)
-plt.grid("both")
-plt.ylim(0, 100)
-plt.xlim(0, 100)
 plt.show()

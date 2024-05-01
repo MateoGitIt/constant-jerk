@@ -7,3 +7,7 @@ def verify_view_bounds(bounds):
     else:
         exit("Bounds are incorrect. Accepted format is x1,x2,y1,y2 where x1 and y1 must "
              "be less than x2 and y2, respectively.")
+
+
+def data_values():
+    

@@ -37,7 +37,7 @@ def hodograph_ins(argv):
 
 
 # verify inputs for view functionality
-def view_ins(argv, caller):
+def view_ins(argv):
     if len(argv) == 5: bounds = argv[4].split(",")
     elif len(argv) == 3: bounds = argv[2].split(",")
 
