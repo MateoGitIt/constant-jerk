@@ -18,7 +18,7 @@ initialAcceleration = 0.1
 initialSpeed = 1
 initialHeight = 100
 xmax = 1000
-tmax = 19.2
+tmax = 19.3
 stepSize = 0.001
 timeIncrement = 0.001
 

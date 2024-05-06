@@ -104,15 +104,15 @@ if __name__ == "__main__":
     fig, ax = plt.subplots(1, 1)
 
     # divergence point between curve and object's trajectory
-    divPoint = hel.divergence_point(ax, X, Y, U)
-    show_div = True if divPoint != (None, None) else False
-
+    div_x, div_y, div_u, div_s = hel.divergence_point(X, Y, U)
+    if (div_x, div_y) != (None, None):
+        show_div = True
     if hodo: 
         fig.canvas.mpl_connect("close_event", exit)
         hel.create_hodograph("RK4", argv[1], ax, X, Y, U=U, frame_num=frame_num, pause_length=pause_length,
-                             div=(show_div, divPoint))
+                             div=(show_div, div_x, div_y, div_u, div_s))
     else: 
-        hel.create_plot("RK4", ax, data=[X, Y], div=(show_div, divPoint))
+        hel.create_plot("RK4", ax, data=[X, Y], div=(show_div, div_x, div_y, div_u, div_s))
         if view: hel.set_view(ax, bounds=bounds)
         if best_curve: 
             initial_guess = [float(x) for x in argv[2].split(",")]

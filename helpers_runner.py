@@ -1,3 +1,6 @@
+from rungekutta import rungekutta_main
+from simulated import simulated_main
+
 def verify_view_bounds(bounds):
     for b in bounds:
         if not isinstance(b, int) and not isinstance(b, float):
@@ -8,6 +11,7 @@ def verify_view_bounds(bounds):
         exit("Bounds are incorrect. Accepted format is x1,x2,y1,y2 where x1 and y1 must "
              "be less than x2 and y2, respectively.")
 
-
-def data_values():
-    
+def compute_curves():
+    rk_X, rk_Y, U = rungekutta_main()
+    kin_X, kin_Y = simulated_main()
+    return [[rk_X, rk_Y], [kin_X, kin_Y], U]

@@ -3,6 +3,11 @@ from random import randint
 from sys import argv
 from rungekutta import rungekutta_main
 
+
+
+# NICEEEEEEEE, THIS CODE SHOWS HOW TO HAVE THE STATIC PLOTS AND A SIMULTANEOUS HODOGRAPH. GOOD JOB. YOU FIGURED IT OUT IN 25 MINUTES.
+
+
 fig, axs = plt.subplots(2, 2)
 
 X, Y, U = rungekutta_main()

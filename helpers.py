@@ -24,17 +24,17 @@ Jt, Jf, Q, g, a0, v0, y0, xmax, tmax, h, dt = parameters.values()
 
 
 # y(x) plot features
-def create_plot(type, ax, data=[], div=(False, ())):
+def create_plot(type, ax, data=[], div=(False, 0, 0, 0, 0)):
 
     # set features and plot X, Y values
     if type == "RK4":
-        plt.plot(data[0], data[1], lw=2, color="tab:red", zorder=2)
-        plt.title("Runge-Kutta 4 y(x) curve")
+        ax.plot(data[0], data[1], lw=2, color="tab:red", zorder=2)
+        ax.set_title("Runge-Kutta 4 y(x) curve")
         if div[0]: 
-            ax.scatter([div[1][0]], [div[1][1]], marker="x", s=30, color="black", zorder=3)
-    elif type == "simulated":
-        plt.plot(data[0], data[1], lw=2, color="tab:blue", zorder=2)
-        plt.title("Simulated y(x) curve from kinematic equations")
+            plot_divergent_free_fall(ax, div[1], div[2], div[3], div[4])
+    elif type == "kinematics":
+        ax.plot(data[0], data[1], lw=2, color="tab:blue", zorder=2)
+        ax.set_title("Simulated y(x) curve from kinematic equations")
 
     ax.set_xlabel("x (m)")
     ax.set_ylabel("y (m)")
@@ -70,7 +70,8 @@ def create_parabolic_fall(ax, X, Y):
 
 
 # hodograph
-def create_hodograph(type, hodo_type, ax, X, Y, U=[], frame_num=100, pause_length=0.1, div=(False, ())):
+def create_hodograph(type, hodo_type, ax, X, Y, U=[], frame_num=100, pause_length=0.1, 
+                     div=(False, 0, 0, 0, 0)):
 
     # Create one origin (x, y) for the vector in each frame
     X_origins = X[::round(len(X) / frame_num)]
@@ -85,7 +86,7 @@ def create_hodograph(type, hodo_type, ax, X, Y, U=[], frame_num=100, pause_lengt
         ax.clear()
         create_plot(type, ax, X, Y) 
         if div[0]: 
-            ax.scatter([div[1][0]], [div[1][1]], marker="x", s=30, color="black", zorder=3)
+            plot_divergent_free_fall(ax, div[1], div[2], div[3], div[4])
         if Y_origins[i] > 0:
 
             # compute x and y components to plot total vector
@@ -103,7 +104,7 @@ def create_hodograph(type, hodo_type, ax, X, Y, U=[], frame_num=100, pause_lengt
     plt.show()
 
 
-def divergence_point(ax, X, Y, U):
+def divergence_point(X, Y, U):
 
     # find (X_i, Y_i) where normal acceleration due to gravity is less than the radial acceleration of the curvature
     print()
@@ -117,14 +118,17 @@ def divergence_point(ax, X, Y, U):
 
         if radial_accel > normal_gravity_accel:
             print_divPoint(X[i], Y[i], radial_accel, normal_gravity_accel, veloc)
-            if dt != 0: 
-                X_parabolic, Y_parabolic = compute.parabolic_free_fall((X[i], Y[i]), veloc, U[i], 1000)
-                ax.plot(X_parabolic, Y_parabolic, linestyle="dotted", color="gray", label="Parabolic free fall", zorder=1)
-            return X[i], Y[i]
+            return X[i], Y[i], U[i], veloc
         
     print("No divergence point exists.")
     print()
-    return None, None
+    return None, None, None, None
+
+
+def plot_divergent_free_fall(ax, x, y, u, veloc):
+    ax.scatter(x, y, marker="x", s=30, color="black", zorder=3)
+    X_parabolic, Y_parabolic = compute.parabolic_free_fall((x, y), veloc, u, 1000)
+    ax.plot(X_parabolic, Y_parabolic, linestyle="dotted", color="gray", label="Parabolic free fall", zorder=1)
 
 
 def hodograph_components(vector, ax, X_origin, Y_origin, u, x_comp, y_comp):
