@@ -27,7 +27,7 @@ Jt, Jf, Q, g, a0, v0, y0, xmax, tmax, h, dt = parameters.values()
 def create_plot(type, ax, data=[], div=(False, 0, 0, 0, 0)):
 
     # set features and plot X, Y values
-    if type == "RK4":
+    if type == "rk4":
         ax.plot(data[0], data[1], lw=2, color="tab:red", zorder=2)
         ax.set_title("Runge-Kutta 4 y(x) curve")
         if div[0]: 
@@ -53,20 +53,18 @@ def set_view(ax, bounds):
     ax.spines['right'].set_visible(False)
 
 
-def create_fit_curve(X, Y, model, initial_guess, x1, x2):
+def create_fit_curve(model, ax, initial_guess, x1, x2, data=[]):
+
+    solid_colors = ['g', 'c', 'm', 'y', 'k']
     start = time.time()
 
-    popt, pcov = curve_fit(mf.models[model], X, Y, p0=initial_guess)
+    popt, pcov = curve_fit(mf.models[model], data[0], data[1], p0=initial_guess)
     X_reg = np.linspace(x1, x2, 10000)
     Y_reg = mf.models[model](X_reg, *popt)
 
-    plt.plot(X_reg, Y_reg, "--", color="black", label="Best-fit curve", zorder=1)
+    ax.plot(X_reg, Y_reg, "--", color=ax._get_lines.get_next_color(), label=model, zorder=1)
     print(f"Curve-fitting execution time: {round(time.time() - start, 2)} seconds")
     print_popt(model, *popt)
-
-
-def create_parabolic_fall(ax, X, Y):
-    ax.plot(X, Y, ".", color="gray", label="Parabolic free fall", zorder=1)
 
 
 # hodograph

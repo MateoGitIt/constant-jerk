@@ -117,7 +117,7 @@ if __name__ == "__main__":
         if best_curve: 
             initial_guess = [float(x) for x in argv[2].split(",")]
             if len(bounds) == 4: 
-                hel.create_fit_curve(X, Y, argv[1], initial_guess, bounds[0], bounds[1])
+                hel.create_fit_curve(argv[1], initial_guess, bounds[0], bounds[1], data=[X, Y])
             else: 
-                hel.create_fit_curve(X, Y, argv[1], initial_guess, -(xmax+round(0.15*xmax)), xmax + round(0.15*xmax))
+                hel.create_fit_curve(argv[1], initial_guess, -(xmax+round(0.15*xmax)), xmax + round(0.15*xmax), data=[X, Y])
         plt.show()

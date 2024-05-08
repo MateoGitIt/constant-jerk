@@ -11,7 +11,8 @@ def verify_view_bounds(bounds):
         exit("Bounds are incorrect. Accepted format is x1,x2,y1,y2 where x1 and y1 must "
              "be less than x2 and y2, respectively.")
 
+
 def compute_curves():
     rk_X, rk_Y, U = rungekutta_main()
     kin_X, kin_Y = simulated_main()
-    return [[rk_X, rk_Y], [kin_X, kin_Y], U]
+    return {"rk4": [rk_X, rk_Y], "kinematics": [kin_X, kin_Y], "u_values": U}
