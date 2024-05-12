@@ -61,10 +61,9 @@ def tangential_jerk(u, y):
 
 # TO DO: IMPLEMENT Udoubleprime functions for NORMAL JERK
 def normal_jerk(u, y):
-    first_common_factor = speed(u, y) / pow(1 + pow(u, 2), 2)
-    first_term = Udoubleprime() * pow(speed(u, y), 2)
-    second_common_factor = -3 * Uprime(u, y) * u
-    innermost_paren = (g/Q) + (Uprime(u, y) * pow(speed(u, y), 2) / (1 + pow(u, 2)))
+    common_factor = (Jf * pow(speed(u, y), 3) * Uprime(u, y)) / (pow(1 + pow(u, 2), 2))
+    inner_first_term = (-2 * g * u) / pow(speed(u, y), 2)
+    inner_second_term = (Udoubleprime() * (1 + pow(u, 2)) - 3 * u * pow(Uprime(u, y), 2)) / (Uprime(u, y) * (1 + pow(u, 2)))
     magnitude = first_common_factor * (first_term - second_common_factor*(innermost_paren))
     return magnitude * n_hat(u), magnitude
 

@@ -9,6 +9,8 @@ from inputParams import parameters
 from math import sqrt, pow, isclose
 from scipy.optimize import curve_fit
 from string import ascii_lowercase as alph
+from sklearn.metrics import r2_score
+import sigfig as sf
 import time
 import numpy as np
 import matplotlib.pyplot as plt
@@ -53,18 +55,21 @@ def set_view(ax, bounds):
     ax.spines['right'].set_visible(False)
 
 
-def create_fit_curve(model, ax, initial_guess, x1, x2, data=[]):
+def create_fit_curve(model, ax, initial_guess, x1, x2, data=[], curve_tag=""):
 
-    solid_colors = ['g', 'c', 'm', 'y', 'k']
     start = time.time()
-
     popt, pcov = curve_fit(mf.models[model], data[0], data[1], p0=initial_guess)
-    X_reg = np.linspace(x1, x2, 10000)
-    Y_reg = mf.models[model](X_reg, *popt)
+    Y_reg = mf.models[model](np.array(data[0]), *popt)
+    X_reg_left = np.linspace(x1, round(data[0][0]), 1000)
+    X_reg_right = np.linspace(round(data[0][-1]), x2, 1000)
 
-    ax.plot(X_reg, Y_reg, "--", color=ax._get_lines.get_next_color(), label=model, zorder=1)
+    label_text = f"{model} R^2={sf.round(r2_coefficient(Y_reg, data[1]), 5)}"
+    line_color = ax._get_lines.get_next_color()
+    ax.plot(data[0], Y_reg, "--", color=line_color, label=label_text, zorder=1)
+    ax.plot(X_reg_left, mf.models[model](X_reg_left, *popt), "--", color=line_color, zorder=1)
+    ax.plot(X_reg_right, mf.models[model](X_reg_right, *popt), "--", color=line_color, zorder=1)
     print(f"Curve-fitting execution time: {round(time.time() - start, 2)} seconds")
-    print_popt(model, *popt)
+    print_popt(model, curve_tag, *popt)
 
 
 # hodograph
@@ -164,9 +169,8 @@ def print_divPoint(x, y, radial_accel, normal_gravity_accel, veloc):
     print()
 
 
-def print_popt(model, *params):
+def print_popt(model, curve_tag, *params):
     params = [x for x in params]
-    print("__________________________________\n")
 
     if len(model.split("_")) == 2 and model.split("_")[1] == "poly":
         if model.split("_")[1] == "poly":
@@ -178,11 +182,15 @@ def print_popt(model, *params):
     elif model == "exponential":
         model_tag = "exponential of the form y = a * e^(bx) + c"
 
-    print(f"Coefficients of best-fit {model_tag} are:\n")
+    print(f"Coefficients of best-fit {model_tag} for {curve_tag} curve are:\n")
     for i, coef in enumerate(params):
         print(f"{alph[i]}: {coef}")        
         
     print("\n__________________________________\n")
+
+
+def r2_coefficient(Y_pred, Y_true):
+    return r2_score(Y_true, Y_pred)
 
 
 # adaptive x-axis
