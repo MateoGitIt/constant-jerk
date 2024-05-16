@@ -109,7 +109,7 @@ if __name__ == "__main__":
         show_div = True
     if hodo: 
         fig.canvas.mpl_connect("close_event", exit)
-        hel.create_hodograph("RK4", argv[1], ax, X, Y, U=U, frame_num=frame_num, pause_length=pause_length,
+        hel.create_hodograph("rk4", argv[1], ax, X, Y, U=U, frame_num=frame_num, pause_length=pause_length,
                              div=(show_div, div_x, div_y, div_u, div_s))
     else: 
         hel.create_plot("RK4", ax, data=[X, Y], div=(show_div, div_x, div_y, div_u, div_s))

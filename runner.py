@@ -5,11 +5,11 @@ view. This "runner.py" file calls other files in this repository to achieve the 
 
 """
 
-from helpers import create_plot, set_view, divergence_point, create_fit_curve
+from helpers import create_plot, set_view, divergence_point, create_fit_curve, create_hodograph
 from helpers_runner import verify_view_bounds, compute_curves
 import matplotlib.pyplot as plt
 
-# BEST-FIT MODEL: READY, IMPLEMENTED R SQUARED COEFFICIENT
+# BEST-FIT MODEL: READY
 # HODOGRAPH: NOT DONE
 # ANIMATION (3RD ROW): NOT READY
 # CSV OUTPUT FILE: NOT DONE
@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 
 fig, axs = plt.subplots(2, 2)
 data = compute_curves()
-view_bounds = [-5000, 5000, -5000, 5000]
+view_bounds = [-500, 500, -500, 500]
 
 # DIVERGENCE POINT AND TRAJECTORY
 divergence_motion = True
@@ -45,16 +45,23 @@ Availaible hodographs types:
 3) "jerk_tan_norm" , "accel_tan_norm" (total vectors w/ tangential and normal components)
 
 """
-hodo = False
-hodograph_type = ""
-frames = 100
-pause = 0.1
-
 
 view = True
 if view and verify_view_bounds(view_bounds):
     for ax in axs[0]:
         set_view(ax, view_bounds)
+    
+hodo = True
+hodograph_type = "accel_tan_norm"
+frames = 100
+pause = 0.0001
+
+if hodo:
+    create_hodograph("rk4", hodograph_type, axs[1][0], data["rk4"][0], data["rk4"][1], U=data["u_values"],
+                     frame_num=frames, pause_length=pause, view=view_bounds)
+    create_hodograph("kinematics", hodograph_type, axs[1][0], data["kinematics"][0], data["kinematics"][1], U=data["u_values"],
+                     frame_num=frames, pause_length=pause, view=view_bounds)
+
 
 # CSV OUTPUT FILE: TBD
 create_csv_file = True

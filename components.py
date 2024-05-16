@@ -68,6 +68,13 @@ def normal_jerk(u, y):
     return magnitude * n_hat(u), magnitude
 
 
+def vector_xy():
+    pass
+
+
+def vector_tang_norm():
+    pass
+
 def veloc_xcomp(u, speed):
     return abs(speed) * cos(atan(u))
 

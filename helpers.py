@@ -19,7 +19,7 @@ import components as com # type: ignore
 import computations as compute # type: ignore
 
 # factor to scale up vectors in hodograph
-vector_scale = 10
+vector_scale = 15
 
 # unpack inputs from "inputParams.py"
 Jt, Jf, Q, g, a0, v0, y0, xmax, tmax, h, dt = parameters.values()
@@ -74,37 +74,39 @@ def create_fit_curve(model, ax, initial_guess, x1, x2, data=[], curve_tag=""):
 
 # hodograph
 def create_hodograph(type, hodo_type, ax, X, Y, U=[], frame_num=100, pause_length=0.1, 
-                     div=(False, 0, 0, 0, 0)):
-
+                     div=(False, 0, 0, 0, 0), view=[]):
+    
     # Create one origin (x, y) for the vector in each frame
     X_origins = X[::round(len(X) / frame_num)]
     Y_origins = Y[::round(len(Y) / frame_num)]
     U_origins = U[::round(len(X) / frame_num)]
+    vector_type, *comps = hodo_type.split("_")
+    view_setting = True if len(view) > 0 else False
+    comps_length = len(comps)
 
-    vector = hodo_type.split("_")
-    x_comp_funcs = {"jerk": com.jerk_xcomp, "accel": com.accel_xcomp}
-    y_comp_funcs = {"jerk": com.jerk_ycomp, "accel": com.accel_ycomp}
-
+    # Compute vectors
+    Xc, Yc = com.vector_xy(vector_type, U_origins, Y_origins)
+    if comps_length == 3:
+        tang, norm = com.vector_tang_norm(vector_type, U_origins, Y_origins)
+    
     for i in range(frame_num):
         ax.clear()
-        create_plot(type, ax, X, Y) 
-        if div[0]: 
-            plot_divergent_free_fall(ax, div[1], div[2], div[3], div[4])
-        if Y_origins[i] > 0:
-
-            # compute x and y components to plot total vector
-            x_comp = vector_scale * x_comp_funcs[vector[0]](U_origins[i], Y_origins[i])
-            y_comp = vector_scale * y_comp_funcs[vector[0]](U_origins[i], Y_origins[i])
-            ax.quiver(X_origins[i], Y_origins[i], x_comp, y_comp, headaxislength=3, headlength=3.5,
-                    color="red", angles="xy", scale_units="xy", scale=1)
-            
-            # Plot additional components if requested
-            if hodo_type != "jerk" or hodo_type != "accel":
-                hodograph_components(vector, ax, X_origins[i], Y_origins[i], U_origins[i], x_comp, y_comp)
-                
-        else: break
+        create_plot(type, ax, data=[X, Y])
+        if view_setting: set_view(ax, view)
+        ax.quiver(X_origins[i], Y_origins[i], Xc[i], Yc[i], headaxislength=3, headlength=3.5,
+                color="black", angles="xy", scale_units="xy", scale=1/vector_scale)
+        if comps_length == 2:
+            ax.quiver(X_origins[i], Y_origins[i], Xc[i], 0, headaxislength=3, headlength=3.5,
+                color="black", angles="xy", scale_units="xy", scale=1/vector_scale)
+            ax.quiver(X_origins[i], Y_origins[i], 0, Yc[i], headaxislength=3, headlength=3.5,
+                color="black", angles="xy", scale_units="xy", scale=1/vector_scale)
+        elif comps_length == 3:
+            ax.quiver(X_origins[i], Y_origins[i], tang[i][0], tang[i][1], headaxislength=3, headlength=3.5,
+                color="black", angles="xy", scale_units="xy", scale=1/vector_scale)
+            ax.quiver(X_origins[i], Y_origins[i], norm[i][0], norm[i][1], headaxislength=3, headlength=3.5,
+                color="black", angles="xy", scale_units="xy", scale=1/vector_scale)
         plt.pause(pause_length)
-    plt.show()
+    plt.show() # check if this plt.show() really goes here
 
 
 def divergence_point(X, Y, U):
