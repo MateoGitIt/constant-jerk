@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 
 fig, axs = plt.subplots(2, 2)
 data = compute_curves()
-view_bounds = [-500, 500, -500, 500]
+view_bounds = [-500, 1500, -1500, 500]
 
 # DIVERGENCE POINT AND TRAJECTORY
 divergence_motion = True
@@ -29,12 +29,14 @@ best_fit = True
 best_fit_models = {"3_poly": [1, 1, 1, 1], "2_poly": [1, 1, 1], "5_poly": [1, 1, 1, 1, 1, 1]}
 
 plots = ["rk4", "kinematics"]
+
 for i, ax in enumerate(axs[0]): # axs[0] yields top row
     create_plot(plots[i], ax, data=data[plots[i]], div=(divergence_motion, *div_data))
     if best_fit:
         for model in list(best_fit_models.keys()):
             create_fit_curve(model, ax, best_fit_models[model], view_bounds[0], view_bounds[1], data=data[plots[i]], curve_tag=plots[i])
     ax.legend()
+
 
 # HODOGRAPH
 """
@@ -52,16 +54,16 @@ if view and verify_view_bounds(view_bounds):
         set_view(ax, view_bounds)
     
 hodo = True
-hodograph_type = "accel_tan_norm"
-frames = 100
+hodograph_type = "accel_xy"
+frames = 350
 pause = 0.0001
+fig.canvas.mpl_connect("close_event", exit)
 
 if hodo:
     create_hodograph("rk4", hodograph_type, axs[1][0], data["rk4"][0], data["rk4"][1], U=data["u_values"],
                      frame_num=frames, pause_length=pause, view=view_bounds)
     create_hodograph("kinematics", hodograph_type, axs[1][0], data["kinematics"][0], data["kinematics"][1], U=data["u_values"],
                      frame_num=frames, pause_length=pause, view=view_bounds)
-
 
 # CSV OUTPUT FILE: TBD
 create_csv_file = True

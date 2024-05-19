@@ -1,0 +1,6 @@
+HODOGRAPH:
+
+accel_xy: READY
+accel_tang_norm:
+    - either tangential_accel2 is wrong or t-hat is wrong. Both look right though?
+    - why does tangential_accel work well when it's mathematically identical to tangential_accel2?

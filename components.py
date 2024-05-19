@@ -5,6 +5,8 @@ import numpy as np
 
 # unpack inputs from "inputParams.py"
 Jt, Jf, Q, g, a0, v0, y0, xmax, tmax, h, dt = parameters.values()
+U_origins_cpy = None
+Y_origins_cpy = None
 
 
 def t_hat(u):
@@ -33,15 +35,21 @@ def accel_ycomp(u, y):
 def tangential_accel(u, y):
     x_tan = -(g/Q) * (u / (1 + pow(u, 2)))
     y_tan = -(g/Q) * (pow(u, 2) / (1 + pow(u, 2)))
-    return np.array([x_tan, y_tan]), sqrt(pow(x_tan, 2) + pow(y_tan, 2))
+    magnitude = sqrt(pow(x_tan, 2) + pow(y_tan, 2))
+    return np.array([x_tan, y_tan]), magnitude
 
+# either this tangential acceleration formula is wrong or t-hat is. Both look right?
+def tangential_accel2(u, y):
+    magnitude = (-g/Q) * (u / sqrt(1 + pow(u, 2)))
+    return magnitude * t_hat(u)
 
 def normal_accel(u, y):
     common_factor = pow(speed(u, y), 2) * Uprime(u, y) / pow(1 + pow(u, 2), 2)
     if Jt < 0: common_factor = -1*common_factor # CHECK SIGN LOGIC
     x_norm = common_factor * (-1 * u)
     y_norm = common_factor
-    return np.array([x_norm, y_norm]), sqrt(pow(x_norm, 2) + pow(y_norm, 2))
+    magnitude = sqrt(pow(x_norm, 2) + pow(y_norm, 2))
+    return np.array([x_norm, y_norm]), magnitude
 
 
 def jerk_xcomp(u, y):
@@ -59,21 +67,48 @@ def tangential_jerk(u, y):
     return magnitude * t_hat(u), magnitude
 
 
-# TO DO: IMPLEMENT Udoubleprime functions for NORMAL JERK
 def normal_jerk(u, y):
-    common_factor = (Jf * pow(speed(u, y), 3) * Uprime(u, y)) / (pow(1 + pow(u, 2), 2))
-    inner_first_term = (-2 * g * u) / pow(speed(u, y), 2)
-    inner_second_term = (Udoubleprime() * (1 + pow(u, 2)) - 3 * u * pow(Uprime(u, y), 2)) / (Uprime(u, y) * (1 + pow(u, 2)))
-    magnitude = first_common_factor * (first_term - second_common_factor*(innermost_paren))
+    first_common_factor = (Jf * pow(speed(u, y), 3) * Uprime(u, y)) / (pow(1 + pow(u, 2), 2))
+    first_term = (-2 * g * u) / pow(speed(u, y), 2)
+    second_term = (Udoubleprime(U_origins_cpy, Y_origins_cpy, u, y) * (1 + pow(u, 2)) - 3 * u * pow(Uprime(u, y), 2)) / (Uprime(u, y) * (1 + pow(u, 2)))
+    third_term = (g * u * Uprime(u, y) * speed(u, y)) / pow(1 + pow(u, 2), 2)
+    magnitude = first_common_factor * (first_term - second_term) - third_term
     return magnitude * n_hat(u), magnitude
 
 
-def vector_xy():
-    pass
+def vector_xy(vector, frame_num, U_origins, Y_origins):
+    global U_origins_cpy, Y_origins_cpy
+    U_origins_cpy = U_origins.copy()
+    Y_origins_cpy = Y_origins.copy()
+
+    # table of component functions
+    x_comp_funcs = {"accel": accel_xcomp, "jerk": jerk_xcomp}
+    y_comp_funcs = {"accel": accel_ycomp, "jerk": jerk_ycomp}
+    X_comp = np.empty(frame_num, )
+    Y_comp = np.empty(frame_num)
+
+    # note the number of components per list equals frame_num
+    for i in range(frame_num):
+        X_comp[i] = x_comp_funcs[vector](U_origins[i], Y_origins[i])
+        Y_comp[i] = y_comp_funcs[vector](U_origins[i], Y_origins[i])
+    return X_comp, Y_comp
 
 
-def vector_tang_norm():
-    pass
+def vector_tang_norm(vector, frame_num, U_origins, Y_origins):
+    # Allow other normal_jerk to call Udoubleprime by accessing U values
+    global U_origins_cpy, Y_origins_cpy
+    U_origins_cpy = U_origins.copy()
+    Y_origins_cpy = Y_origins.copy()
+
+    tan_comp_funcs = {"accel": tangential_accel2, "jerk": tangential_jerk}
+    norm_comp_funcs = {"accel": normal_accel, "jerk": normal_jerk}
+    tang = np.empty((frame_num, 2))
+    norm = np.empty((frame_num, 2))
+
+    for i in range(frame_num):
+        tang[i] = tan_comp_funcs[vector](U_origins[i], Y_origins[i])[0]
+        norm[i] = norm_comp_funcs[vector](U_origins[i], Y_origins[i])[0]
+    return tang, norm
 
 def veloc_xcomp(u, speed):
     return abs(speed) * cos(atan(u))

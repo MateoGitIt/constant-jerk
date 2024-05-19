@@ -77,7 +77,7 @@ def rungekutta_main():
         Y = Y[:break_point]
         U = U[:break_point]
         
-    return X, Y, U
+    return np.array(X), np.array(Y), np.array(U)
 
 
 def rungekutta_kvalues(u, y_i):

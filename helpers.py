@@ -19,7 +19,7 @@ import components as com # type: ignore
 import computations as compute # type: ignore
 
 # factor to scale up vectors in hodograph
-vector_scale = 15
+vector_scale = 50
 
 # unpack inputs from "inputParams.py"
 Jt, Jf, Q, g, a0, v0, y0, xmax, tmax, h, dt = parameters.values()
@@ -33,7 +33,8 @@ def create_plot(type, ax, data=[], div=(False, 0, 0, 0, 0)):
         ax.plot(data[0], data[1], lw=2, color="tab:red", zorder=2)
         ax.set_title("Runge-Kutta 4 y(x) curve")
         if div[0]: 
-            plot_divergent_free_fall(ax, div[1], div[2], div[3], div[4])
+            X_parabolic, Y_parabolic = compute.parabolic_free_fall((div[1], div[2]), div[3], div[4], 1000)
+            plot_divergent_free_fall(ax, div[1], div[2], X_parabolic, Y_parabolic)
     elif type == "kinematics":
         ax.plot(data[0], data[1], lw=2, color="tab:blue", zorder=2)
         ax.set_title("Simulated y(x) curve from kinematic equations")
@@ -77,34 +78,47 @@ def create_hodograph(type, hodo_type, ax, X, Y, U=[], frame_num=100, pause_lengt
                      div=(False, 0, 0, 0, 0), view=[]):
     
     # Create one origin (x, y) for the vector in each frame
-    X_origins = X[::round(len(X) / frame_num)]
-    Y_origins = Y[::round(len(Y) / frame_num)]
-    U_origins = U[::round(len(X) / frame_num)]
+    X_origins = X[::len(X) // frame_num]
+    Y_origins = Y[::len(Y) // frame_num]
+    U_origins = U[::len(X) // frame_num]
     vector_type, *comps = hodo_type.split("_")
     view_setting = True if len(view) > 0 else False
+    divergence = div[0]
     comps_length = len(comps)
 
+    # properties of the arrows displayed by ax.quiver()
+    quiver_params = {
+        "headaxislength": 3,
+        "headlength": 3.5,
+        "color": "black",
+        "angles": "xy",
+        "scale_units": "xy",
+        "scale": 1/vector_scale
+    }
+
     # Compute vectors
-    Xc, Yc = com.vector_xy(vector_type, U_origins, Y_origins)
-    if comps_length == 3:
-        tang, norm = com.vector_tang_norm(vector_type, U_origins, Y_origins)
+    Xc, Yc = com.vector_xy(vector_type, frame_num, U_origins, Y_origins)
+    if comps_length == 2:
+        tang, norm = com.vector_tang_norm(vector_type, frame_num, U_origins, Y_origins)
+
+    # Compute parabolic free fall trajectory
+    div_x, div_y = (div[1], div[2])
+    X_parabolic, Y_parabolic = compute.parabolic_free_fall((div_x, div_y), div[3], div[4], 1000)
     
     for i in range(frame_num):
         ax.clear()
         create_plot(type, ax, data=[X, Y])
         if view_setting: set_view(ax, view)
-        ax.quiver(X_origins[i], Y_origins[i], Xc[i], Yc[i], headaxislength=3, headlength=3.5,
-                color="black", angles="xy", scale_units="xy", scale=1/vector_scale)
-        if comps_length == 2:
-            ax.quiver(X_origins[i], Y_origins[i], Xc[i], 0, headaxislength=3, headlength=3.5,
-                color="black", angles="xy", scale_units="xy", scale=1/vector_scale)
-            ax.quiver(X_origins[i], Y_origins[i], 0, Yc[i], headaxislength=3, headlength=3.5,
-                color="black", angles="xy", scale_units="xy", scale=1/vector_scale)
-        elif comps_length == 3:
-            ax.quiver(X_origins[i], Y_origins[i], tang[i][0], tang[i][1], headaxislength=3, headlength=3.5,
-                color="black", angles="xy", scale_units="xy", scale=1/vector_scale)
-            ax.quiver(X_origins[i], Y_origins[i], norm[i][0], norm[i][1], headaxislength=3, headlength=3.5,
-                color="black", angles="xy", scale_units="xy", scale=1/vector_scale)
+        if divergence: plot_divergent_free_fall(ax, div_x, div_y, X_parabolic, Y_parabolic)
+        ax.quiver(X_origins[i], Y_origins[i], Xc[i], Yc[i], **quiver_params)
+        if comps_length == 1:
+            ax.quiver(X_origins[i], Y_origins[i], Xc[i], 0, **quiver_params)
+            ax.quiver(X_origins[i], Y_origins[i], 0, Yc[i], **quiver_params)
+        elif comps_length == 2:
+            print(f"tangential: ({tang[i, 0]}, {tang[i, 1]})")
+            print(f"normal: ({norm[i, 0]}, {norm[i, 1]})")
+            ax.quiver(X_origins[i], Y_origins[i], tang[i, 0], tang[i, 1], **quiver_params)
+            ax.quiver(X_origins[i], Y_origins[i], norm[i, 0], norm[i, 1], **quiver_params)
         plt.pause(pause_length)
     plt.show() # check if this plt.show() really goes here
 
@@ -125,42 +139,14 @@ def divergence_point(X, Y, U):
             print_divPoint(X[i], Y[i], radial_accel, normal_gravity_accel, veloc)
             return X[i], Y[i], U[i], veloc
         
-    print("No divergence point exists.")
+    print("No divergence point exists in the given curve.")
     print()
     return None, None, None, None
 
 
-def plot_divergent_free_fall(ax, x, y, u, veloc):
+def plot_divergent_free_fall(ax, x, y, X_parabolic, Y_parabolic):
     ax.scatter(x, y, marker="x", s=30, color="black", zorder=3)
-    X_parabolic, Y_parabolic = compute.parabolic_free_fall((x, y), veloc, u, 1000)
     ax.plot(X_parabolic, Y_parabolic, linestyle="dotted", color="gray", label="Parabolic free fall", zorder=1)
-
-
-def hodograph_components(vector, ax, X_origin, Y_origin, u, x_comp, y_comp):
-
-    # map user input to component functions
-    tan_comp_funcs = {"jerk": com.tangential_jerk, "accel": com.tangential_accel}
-    norm_comp_funcs = {"jerk": com.normal_jerk, "accel": com.normal_accel}
-
-    # if vector = ["jerk", "comp"]
-    if len(vector) == 2:
-        ax.quiver(X_origin, Y_origin, x_comp, 0, headaxislength=2, headlength=2, 
-                  angles="xy", scale_units="xy", scale=1)
-        ax.quiver(X_origin, Y_origin, 0, y_comp, headaxislength=2, headlength=2, 
-                  angles="xy", scale_units="xy", scale=1)
-        
-    # if vector = ["jerk", "tan", "norm"]
-    elif len(vector) == 3:
-
-        # compute normal and tangent vectors in terms of x and y components
-        x_tan, y_tan = tan_comp_funcs[vector[0]](u, Y_origin)[0]
-        x_norm, y_norm = norm_comp_funcs[vector[0]](u, Y_origin)[0]
-
-        # plot normal and tangent vectors
-        ax.quiver(X_origin, Y_origin, vector_scale * x_tan, vector_scale * y_tan, headaxislength=2, headlength=2, 
-                  angles="xy", scale_units="xy", scale=1)
-        ax.quiver(X_origin, Y_origin, vector_scale * x_norm, vector_scale * y_norm, headaxislength=2, headlength=2, 
-                  angles="xy", scale_units="xy", scale=1)
 
 
 def print_divPoint(x, y, radial_accel, normal_gravity_accel, veloc):
