@@ -19,13 +19,14 @@ view_bounds = [-500, 1500, -1500, 500]
 divergence_motion = True
 div_data = divergence_point(data["rk4"][0], data["rk4"][1], data["u_values"])
 
-hodograph_type = "accel_xy"
+hodograph_type = "jerk"
+scale = 200
 frames = 100
 pause = 0.0001
 fig.canvas.mpl_connect("close_event", exit)
 create_hodograph("rk4", hodograph_type, axs[0], data["rk4"][0], data["rk4"][1], U=data["u_values"], div=(True, *div_data),
-                    frame_num=frames, pause_length=pause, view=view_bounds)
-#create_hodograph("kinematics", hodograph_type, axs[1], data["kinematics"][0], data["kinematics"][1], U=data["u_values"],
-#                    frame_num=frames, pause_length=pause, view=view_bounds)
+                    frame_num=frames, pause_length=pause, view=view_bounds, scale=scale)
+create_hodograph("kinematics", hodograph_type, axs[1], data["kinematics"][0], data["kinematics"][1], U=data["u_values"],
+                    frame_num=frames, pause_length=pause, view=view_bounds, scale=scale)
 
 plt.show()

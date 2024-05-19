@@ -1,6 +1,19 @@
 HODOGRAPH:
 
-accel_xy: READY
+accel: READY. Looks pretty good.
+accel_xy: READY. Looks pretty good.
 accel_tang_norm:
     - either tangential_accel2 is wrong or t-hat is wrong. Both look right though?
     - why does tangential_accel work well when it's mathematically identical to tangential_accel2?
+
+jerk: 
+    - There appears to be a problem in the implementation of the magnitude of the normal jerk
+    - This problem comes from "second_term", the variable that calls Udoubleprime
+    - The problem potentially lies in calculating Udoubleprime by dividing by h, the step size. Because this calculation
+      is done with U_origins, which was shrunk down to fit the number of frames of the hodograph, the horizontal distance
+      between each Uprime value is larger than h. Increasing the denominator of this slope calculation should decrease 
+      Udoubleprime and yield the real magnitude of the normal jerk. 
+    - A note on how we're calculating Udoubleprime: there are three possble slopes for a set of three points. The current implementation
+      uses the extreme points for finding an average slope – mean value theorem. 
+jerk_xy:
+jerk_tang_norm:

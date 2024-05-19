@@ -3,8 +3,6 @@ from helpers_runner import verify_view_bounds, compute_curves
 import matplotlib.pyplot as plt
 
 # BEST-FIT MODEL: READY
-# HODOGRAPH: NOT DONE
-# ANIMATION (3RD ROW): NOT READY
 # CSV OUTPUT FILE: NOT DONE
 # DIVERGENCE MOTION: READY
 # STATIC PLOTS: READY
@@ -29,7 +27,6 @@ for i, ax in enumerate(axs): # axs[0] yields top row
         for model in list(best_fit_models.keys()):
             create_fit_curve(model, ax, best_fit_models[model], view_bounds[0], view_bounds[1], data=data[plots[i]], curve_tag=plots[i])
     ax.legend()
-
 
 view = True
 if view and verify_view_bounds(view_bounds):

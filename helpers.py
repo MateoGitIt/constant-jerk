@@ -18,9 +18,6 @@ import model_funcs as mf # type: ignore
 import components as com # type: ignore
 import computations as compute # type: ignore
 
-# factor to scale up vectors in hodograph
-vector_scale = 50
-
 # unpack inputs from "inputParams.py"
 Jt, Jf, Q, g, a0, v0, y0, xmax, tmax, h, dt = parameters.values()
 
@@ -75,7 +72,7 @@ def create_fit_curve(model, ax, initial_guess, x1, x2, data=[], curve_tag=""):
 
 # hodograph
 def create_hodograph(type, hodo_type, ax, X, Y, U=[], frame_num=100, pause_length=0.1, 
-                     div=(False, 0, 0, 0, 0), view=[]):
+                     div=(False, 0, 0, 0, 0), view=[], scale=1):
     
     # Create one origin (x, y) for the vector in each frame
     X_origins = X[::len(X) // frame_num]
@@ -93,13 +90,14 @@ def create_hodograph(type, hodo_type, ax, X, Y, U=[], frame_num=100, pause_lengt
         "color": "black",
         "angles": "xy",
         "scale_units": "xy",
-        "scale": 1/vector_scale
+        "scale": 1/scale,
+        "zorder": 3
     }
 
     # Compute vectors
-    Xc, Yc = com.vector_xy(vector_type, frame_num, U_origins, Y_origins)
+    Xc, Yc = com.vector_xy(vector_type, frame_num, U_origins, Y_origins, X_origins)
     if comps_length == 2:
-        tang, norm = com.vector_tang_norm(vector_type, frame_num, U_origins, Y_origins)
+        tang, norm = com.vector_tang_norm(vector_type, frame_num, U_origins, Y_origins, X_origins)
 
     # Compute parabolic free fall trajectory
     div_x, div_y = (div[1], div[2])

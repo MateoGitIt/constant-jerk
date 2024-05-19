@@ -29,18 +29,21 @@ def parabolic_free_fall(divPoint, u, speed, duration):
     return X, Y
 
 # this function searches for u and y in U_origins and Y_origins and calculates Uprime at the (i+1)-th and (i-1)-th positions
-def Udoubleprime(U_origins, Y_origins, u, y):
+def Udoubleprime(U_origins, Y_origins, X_origins, u, y):
     U_olength = len(U_origins)
     for i, u_value in enumerate(U_origins):
         if u_value == u:
             if i != 0 and i != U_olength - 1:
                 uprime_before = Uprime(U_origins[i - 1], Y_origins[i - 1])
                 uprime_after = Uprime(U_origins[i + 1], Y_origins[i + 1])
+                hodo_stepsize = X_origins[i + 1] - X_origins[i - 1]
             elif i == 0:
                 uprime_before = Uprime(U_origins[i], y)
                 uprime_after = Uprime(U_origins[i + 1], Y_origins[i + 1])
+                hodo_stepsize = X_origins[i + 1] - X_origins[i]
             elif i == U_olength - 1:
                 uprime_before = Uprime(U_origins[i - 1], Y_origins[i + 1])
                 uprime_after = Uprime(U_origins[i], y)
-            slope = (uprime_after - uprime_before) / h
+                hodo_stepsize = X_origins[i] - X_origins[i - 1]
+            slope = (uprime_after - uprime_before) / hodo_stepsize
     return slope
