@@ -57,12 +57,7 @@ def normal_accel(u, y):
     return np.array([x_norm, y_norm]), magnitude
 
 
-count = 0
 def jerk_xcomp(u, y):
-    global count
-    if count < 11:
-        print(f"Magnitude of tangential jerk: {tangential_jerk(u, y)[1]}")
-
     return (tangential_jerk(u, y)[1] * t_hat(u)[0]) + (normal_jerk(u, y)[1] * n_hat(u)[0])
 
 
@@ -76,18 +71,19 @@ def tangential_jerk(u, y):
     magnitude = common_factor * (-1 * (g/Q) - second_term)
     return magnitude * t_hat(u), magnitude
 
-
+count = 0
 def normal_jerk(u, y):
     global count
 
-    first_common_factor = (Jf * pow(speed(u, y), 3) * Uprime(u, y)) / (pow(1 + pow(u, 2), 2))
+    first_common_factor = (Jf * pow(speed(u, y), 3) * sqrt(pow(Uprime(u, y), 2))) / (pow(1 + pow(u, 2), 2))
     first_term = (-2 * g * u) / pow(speed(u, y), 2)
     second_term = ((Udoubleprime(U_origins_cpy, Y_origins_cpy, X_origins_cpy, u, y) * (1 + pow(u, 2))) - 3 * u * pow(Uprime(u, y), 2)) / (Uprime(u, y) * (1 + pow(u, 2)))
     third_term = (g * u * Uprime(u, y) * speed(u, y)) / pow(1 + pow(u, 2), 2)
     magnitude = first_common_factor * (first_term + second_term) - third_term
 
-    if count < 11:
+    if count % 2 == 0:
         print()
+        print(f"Frame: {count}")
         print(f"first_common_factor: {first_common_factor}")
         print(f"first_term: {first_term}")
         print(f"second_term: {second_term}")
@@ -95,7 +91,7 @@ def normal_jerk(u, y):
         print(f"Udoubleprime: {Udoubleprime(U_origins_cpy, Y_origins_cpy, X_origins_cpy, u, y)}")
         print(f"Magnitude of normal jerk: {magnitude}")
         print()
-        count += 1
+    count += 1
 
     return magnitude * n_hat(u), magnitude
 

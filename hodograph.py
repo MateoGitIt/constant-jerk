@@ -13,16 +13,18 @@ import matplotlib.pyplot as plt
 
 fig, axs = plt.subplots(1, 2)
 data = compute_curves()
-view_bounds = [-500, 1500, -1500, 500]
+view_bounds = [-100, 1500, -1500, 100]
 
 # DIVERGENCE POINT AND TRAJECTORY
 divergence_motion = True
 div_data = divergence_point(data["rk4"][0], data["rk4"][1], data["u_values"])
 
-hodograph_type = "jerk"
-scale = 200
+# flip the vectors
+
+hodograph_type = "jerk_tang_norm"
+scale = 300
 frames = 100
-pause = 0.0001
+pause = 0.001
 fig.canvas.mpl_connect("close_event", exit)
 create_hodograph("rk4", hodograph_type, axs[0], data["rk4"][0], data["rk4"][1], U=data["u_values"], div=(True, *div_data),
                     frame_num=frames, pause_length=pause, view=view_bounds, scale=scale)

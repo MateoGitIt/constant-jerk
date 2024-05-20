@@ -113,8 +113,8 @@ def create_hodograph(type, hodo_type, ax, X, Y, U=[], frame_num=100, pause_lengt
             ax.quiver(X_origins[i], Y_origins[i], Xc[i], 0, **quiver_params)
             ax.quiver(X_origins[i], Y_origins[i], 0, Yc[i], **quiver_params)
         elif comps_length == 2:
-            print(f"tangential: ({tang[i, 0]}, {tang[i, 1]})")
-            print(f"normal: ({norm[i, 0]}, {norm[i, 1]})")
+            #print(f"tangential: ({tang[i, 0]}, {tang[i, 1]})")
+            #print(f"normal: ({norm[i, 0]}, {norm[i, 1]})")
             ax.quiver(X_origins[i], Y_origins[i], tang[i, 0], tang[i, 1], **quiver_params)
             ax.quiver(X_origins[i], Y_origins[i], norm[i, 0], norm[i, 1], **quiver_params)
         plt.pause(pause_length)

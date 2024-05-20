@@ -15,5 +15,11 @@ jerk:
       Udoubleprime and yield the real magnitude of the normal jerk. 
     - A note on how we're calculating Udoubleprime: there are three possble slopes for a set of three points. The current implementation
       uses the extreme points for finding an average slope – mean value theorem. 
-jerk_xy:
+    
+    - TO-DO: check how the values from normal_jerk() printed to the terminal evolve throughout the curve. Check with Dr. Nash if they make sense.
+jerk_xy: 
+    - Fix the normal component
 jerk_tang_norm:
+    - Fix the normal component
+
+check multiprocessing and multithreading
