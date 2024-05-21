@@ -43,10 +43,6 @@ def tangential_accel(u, y):
     magnitude = sqrt(pow(x_tan, 2) + pow(y_tan, 2))
     return np.array([x_tan, y_tan]), magnitude
 
-# either this tangential acceleration formula is wrong or t-hat is. Both look right?
-def tangential_accel2(u, y):
-    magnitude = (-g/Q) * (u / sqrt(1 + pow(u, 2)))
-    return magnitude * t_hat(u)
 
 def normal_accel(u, y):
     common_factor = pow(speed(u, y), 2) * Uprime(u, y) / pow(1 + pow(u, 2), 2)
@@ -67,32 +63,17 @@ def jerk_ycomp(u, y):
 
 def tangential_jerk(u, y):
     common_factor = (Uprime(u, y) * speed(u, y)) / pow(1 + pow(u, 2), 2)
-    second_term = (Uprime(u, y) * pow(speed(u, y), 2)) / (1 + pow(u, 2))
-    magnitude = common_factor * (-1 * (g/Q) - second_term)
+    second_term = Jf*(Uprime(u, y) * pow(speed(u, y), 2)) / (1 + pow(u, 2))
+    magnitude = common_factor * (-1*g - second_term)
     return magnitude * t_hat(u), magnitude
 
-count = 0
-def normal_jerk(u, y):
-    global count
 
+def normal_jerk(u, y):
     first_common_factor = (Jf * pow(speed(u, y), 3) * sqrt(pow(Uprime(u, y), 2))) / (pow(1 + pow(u, 2), 2))
     first_term = (-2 * g * u) / pow(speed(u, y), 2)
     second_term = ((Udoubleprime(U_origins_cpy, Y_origins_cpy, X_origins_cpy, u, y) * (1 + pow(u, 2))) - 3 * u * pow(Uprime(u, y), 2)) / (Uprime(u, y) * (1 + pow(u, 2)))
     third_term = (g * u * Uprime(u, y) * speed(u, y)) / pow(1 + pow(u, 2), 2)
     magnitude = first_common_factor * (first_term + second_term) - third_term
-
-    if count % 2 == 0:
-        print()
-        print(f"Frame: {count}")
-        print(f"first_common_factor: {first_common_factor}")
-        print(f"first_term: {first_term}")
-        print(f"second_term: {second_term}")
-        print(f"third_term: {third_term}")
-        print(f"Udoubleprime: {Udoubleprime(U_origins_cpy, Y_origins_cpy, X_origins_cpy, u, y)}")
-        print(f"Magnitude of normal jerk: {magnitude}")
-        print()
-    count += 1
-
     return magnitude * n_hat(u), magnitude
 
 
@@ -122,7 +103,7 @@ def vector_tang_norm(vector, frame_num, U_origins, Y_origins, X_origins):
     Y_origins_cpy = Y_origins.copy()
     X_origins_cpy = X_origins.copy()
 
-    tan_comp_funcs = {"accel": tangential_accel2, "jerk": tangential_jerk}
+    tan_comp_funcs = {"accel": tangential_accel, "jerk": tangential_jerk}
     norm_comp_funcs = {"accel": normal_accel, "jerk": normal_jerk}
     tang = np.empty((frame_num, 2))
     norm = np.empty((frame_num, 2))

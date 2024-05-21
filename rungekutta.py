@@ -27,7 +27,7 @@ X = np.linspace(0, xmax, int(xmax / h)).tolist()
 view = False
 bounds = []
 if len(argv) == 3 and argv[1] == "view":
-    bounds, view = verify.view_ins(argv)
+    bounds = verify.view_ins(argv)
 
 # INPUT: best fit curve
 best_curve = False
@@ -112,8 +112,7 @@ if __name__ == "__main__":
         hel.create_hodograph("rk4", argv[1], ax, X, Y, U=U, frame_num=frame_num, pause_length=pause_length,
                              div=(show_div, div_x, div_y, div_u, div_s))
     else: 
-        hel.create_plot("RK4", ax, data=[X, Y], div=(show_div, div_x, div_y, div_u, div_s))
-        if view: hel.set_view(ax, bounds=bounds)
+        hel.create_plot("RK4", ax, data=[X, Y], div=(show_div, div_x, div_y, div_u, div_s), view=[view, *bounds])
         if best_curve: 
             initial_guess = [float(x) for x in argv[2].split(",")]
             if len(bounds) == 4: 

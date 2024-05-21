@@ -11,7 +11,7 @@ from helpers import create_plot, set_view, divergence_point, create_fit_curve, c
 from helpers_runner import verify_view_bounds, compute_curves
 import matplotlib.pyplot as plt
 
-fig, axs = plt.subplots(1, 2)
+fig, ax = plt.subplots(1, 1)
 data = compute_curves()
 view_bounds = [-100, 1500, -1500, 100]
 
@@ -22,13 +22,11 @@ div_data = divergence_point(data["rk4"][0], data["rk4"][1], data["u_values"])
 # flip the vectors
 
 hodograph_type = "jerk_tang_norm"
-scale = 300
-frames = 100
+scale = 250
+frames = 150
 pause = 0.001
 fig.canvas.mpl_connect("close_event", exit)
-create_hodograph("rk4", hodograph_type, axs[0], data["rk4"][0], data["rk4"][1], U=data["u_values"], div=(True, *div_data),
-                    frame_num=frames, pause_length=pause, view=view_bounds, scale=scale)
-create_hodograph("kinematics", hodograph_type, axs[1], data["kinematics"][0], data["kinematics"][1], U=data["u_values"],
-                    frame_num=frames, pause_length=pause, view=view_bounds, scale=scale)
+create_hodograph("rk4", hodograph_type, ax, data["rk4"][0], data["rk4"][1], U=data["u_values"], div=(True, *div_data),
+                    frame_num=frames, pause_length=pause, view=verify_view_bounds(view_bounds), scale=scale)
 
 plt.show()

@@ -23,24 +23,34 @@ Jt, Jf, Q, g, a0, v0, y0, xmax, tmax, h, dt = parameters.values()
 
 
 # y(x) plot features
-def create_plot(type, ax, data=[], div=(False, 0, 0, 0, 0)):
+def create_plot(type, ax, data=[], div=(False, 0, 0, 0, 0), view=(False, 0, 0, 0, 0), show_textbox=False):
 
     # set features and plot X, Y values
+    if view[0]:
+        view_setting, x1, x2, y1, y2 = view
+    else:
+        view_setting = False
+
     if type == "rk4":
-        ax.plot(data[0], data[1], lw=2, color="tab:red", zorder=2)
+        ax.plot(data[0], data[1], lw=2, label="y(x)", color="tab:red", zorder=2)
         ax.set_title("Runge-Kutta 4 y(x) curve")
         if div[0]: 
             X_parabolic, Y_parabolic = compute.parabolic_free_fall((div[1], div[2]), div[3], div[4], 1000)
             plot_divergent_free_fall(ax, div[1], div[2], X_parabolic, Y_parabolic)
     elif type == "kinematics":
-        ax.plot(data[0], data[1], lw=2, color="tab:blue", zorder=2)
+        ax.plot(data[0], data[1], label="y(x)", lw=2, color="tab:blue", zorder=2)
         ax.set_title("Simulated y(x) curve from kinematic equations")
 
+    if view_setting:
+        set_view(ax, [x1, x2, y1, y2])
+    else:
+        ax.set_ylim(0, y0+(round(y0/8)))
+        ax.set_xlim(0, xAxis(data[0], data[1]))
     ax.set_xlabel("x (m)")
     ax.set_ylabel("y (m)")
-    ax.set_ylim(0, y0+(round(y0/8)))
-    ax.set_xlim(0, xAxis(data[0], data[1]))
     ax.grid("both")
+
+    if show_textbox: print_initial_conditions(ax)
 
 
 def set_view(ax, bounds):
@@ -87,6 +97,7 @@ def create_hodograph(type, hodo_type, ax, X, Y, U=[], frame_num=100, pause_lengt
     quiver_params = {
         "headaxislength": 3,
         "headlength": 3.5,
+        "width": 1/scale,
         "color": "black",
         "angles": "xy",
         "scale_units": "xy",
@@ -113,8 +124,7 @@ def create_hodograph(type, hodo_type, ax, X, Y, U=[], frame_num=100, pause_lengt
             ax.quiver(X_origins[i], Y_origins[i], Xc[i], 0, **quiver_params)
             ax.quiver(X_origins[i], Y_origins[i], 0, Yc[i], **quiver_params)
         elif comps_length == 2:
-            #print(f"tangential: ({tang[i, 0]}, {tang[i, 1]})")
-            #print(f"normal: ({norm[i, 0]}, {norm[i, 1]})")
+            print(f"Frame {i}: magnitude of tangential: {sqrt(pow(tang[i, 0], 2) + pow(tang[i, 1], 2))}")
             ax.quiver(X_origins[i], Y_origins[i], tang[i, 0], tang[i, 1], **quiver_params)
             ax.quiver(X_origins[i], Y_origins[i], norm[i, 0], norm[i, 1], **quiver_params)
         plt.pause(pause_length)
@@ -154,6 +164,12 @@ def print_divPoint(x, y, radial_accel, normal_gravity_accel, veloc):
     print(f"Speed: {veloc} m/s")
     print()
 
+
+def print_initial_conditions(ax):
+    text = f"Height: {y0}m\nSpeed: {v0}m/s\nAccel: {a0}m/s2\nJerk:{Jt}m/s3"
+    box = dict(boxstyle='round', fc='blanchedalmond', ec='orange', alpha=0.5, pad=0.5)
+    x, y = (0.65 * ax.get_xlim()[1], 0.93 * ax.get_ylim()[0])
+    ax.text(x, y, text, fontsize=10, bbox=box, horizontalalignment='left')
 
 def print_popt(model, curve_tag, *params):
     params = [x for x in params]
