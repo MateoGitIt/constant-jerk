@@ -1,5 +1,5 @@
-from helpers import create_plot, set_view, divergence_point, create_fit_curve, create_hodograph
-from helpers_runner import verify_view_bounds, compute_curves
+from helpers import create_plot, divergence_point, create_fit_curve
+from helpers_runner import verify_view_bounds, compute_curves, export_data
 import matplotlib.pyplot as plt
 
 # BEST-FIT MODEL: READY
@@ -33,8 +33,10 @@ for i, ax in enumerate(axs):
     ax.legend()
 
 
-# CSV OUTPUT FILE: TBD
-create_csv_file = True
-output_filename = "test.csv"
+create_output_file = True
+output_filename = "test2.xlsx"
+file_format = "xlsx"
+if create_output_file:
+    export_data(output_filename, data, file_format)
 
 plt.show()

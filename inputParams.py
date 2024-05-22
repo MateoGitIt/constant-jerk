@@ -6,7 +6,7 @@ If you change any input parameters here, make sure to make [main.py] compatible 
 
 """
 
-# Jerk and jerk factor
+# jerk and jerk factor
 tangentialJerk = 0.5
 if tangentialJerk <= 0: jerkfactor = 1
 else: jerkfactor = -1
@@ -17,9 +17,9 @@ g = 9.81
 initialAcceleration = 0.1
 initialSpeed = 1
 initialHeight = 100
-xmax = 1000
+xmax = 500
 tmax = 19.3
-stepSize = 0.001
+stepSize = 0.01
 timeIncrement = 0.001
 
 parameters = {"j_t":  tangentialJerk, 

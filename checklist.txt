@@ -4,11 +4,14 @@ accel: READY. Looks pretty good.
 accel_xy: READY. Looks pretty good.
 accel_tang_norm: READY. Looks pretty good.
 
-jerk:     
-    - Doesn't look wrong, but I can't tell if it's right either.
-jerk_xy: 
-    - Fix the normal component
-jerk_tang_norm:
-    - Fix the normal component
+jerk: READY. Looks pretty good.
+jerk_xy: READY. Looks pretty good.
+jerk_tang_norm: READY. Looks pretty good.
 
-check multiprocessing and multithreading
+Allow the user to see jerk and acceleration vectors plotted in the same hodograph at the same time. 
+    - Each vector now has its own scale number
+    - Give each vector color
+    - Make it so that the user can select one vector plus its xy components and the other vector plus it tang/norm components and so on
+
+CSV FILE FUNCTIONALITY:
+READY. Excel and CSV work. Other formats?
