@@ -81,17 +81,17 @@ def create_fit_curve(model, ax, initial_guess, x1, x2, data=[], curve_tag=""):
 
 
 # hodograph
-def create_hodograph(type, hodo_type, ax, X, Y, U=[], frame_num=100, pause_length=0.1, 
+def create_hodograph(type, vectors, ax, X, Y, U=[], frame_num=100, pause_length=0.1, 
                      div=(False, 0, 0, 0, 0), view=[], scale=1):
     
     # Create one origin (x, y) for the vector in each frame
     X_origins = X[::len(X) // frame_num]
     Y_origins = Y[::len(Y) // frame_num]
     U_origins = U[::len(X) // frame_num]
-    vector_type, *comps = hodo_type.split("_")
+    xy_vectors, tang_norm_vectors = parse_vector_input(vectors)
+    vectors_size = len(vectors)
     view_setting = True if len(view) > 0 else False
     divergence = div[0]
-    comps_length = len(comps)
 
     # properties of the arrows displayed by ax.quiver()
     quiver_params = {
@@ -106,27 +106,45 @@ def create_hodograph(type, hodo_type, ax, X, Y, U=[], frame_num=100, pause_lengt
     }
 
     # Compute vectors
-    Xc, Yc = com.vector_xy(vector_type, frame_num, U_origins, Y_origins, X_origins)
-    if comps_length == 2:
-        tang, norm = com.vector_tang_norm(vector_type, frame_num, U_origins, Y_origins, X_origins)
+    X_components = np.empty((vectors_size, frame_num))
+    Y_components = np.empty((vectors_size, frame_num))
+    for i, v in enumerate(vectors):
+        Xc, Yc = com.vector_xy(v[0], frame_num, U_origins, Y_origins, X_origins)
+        X_components[i, :] = Xc
+        Y_components[i, :] = Yc
+
+    tang_norm_size = len(tang_norm_vectors)
+    if tang_norm_size > 0:
+        tang_components = np.empty((tang_norm_size, frame_num, 2))
+        norm_components = np.empty((tang_norm_size, frame_num, 2))
+        for i, vector in enumerate(tang_norm_vectors):
+            tang, norm = com.vector_tang_norm(vector, frame_num, U_origins, Y_origins, X_origins)
+            tang_components[i] = tang
+            norm_components[i] = norm
 
     # Compute parabolic free fall trajectory
     div_x, div_y = (div[1], div[2])
-    X_parabolic, Y_parabolic = compute.parabolic_free_fall((div_x, div_y), div[3], div[4], 1000)
+    if divergence:
+        X_parabolic, Y_parabolic = compute.parabolic_free_fall((div_x, div_y), div[3], div[4], 1000)
     
+    # Define ranges outside animation to decrease overhead of calling range()
+    vector_seq = range(vectors_size)
+    xy_seq = range(len(xy_vectors))
+    tang_norm_seq = range(tang_norm_size)
+
     for i in range(frame_num):
         ax.clear()
         create_plot(type, ax, data=[X, Y])
         if view_setting: set_view(ax, view)
         if divergence: plot_divergent_free_fall(ax, div_x, div_y, X_parabolic, Y_parabolic)
-        ax.quiver(X_origins[i], Y_origins[i], Xc[i], Yc[i], **quiver_params)
-        if comps_length == 1:
-            ax.quiver(X_origins[i], Y_origins[i], Xc[i], 0, **quiver_params)
-            ax.quiver(X_origins[i], Y_origins[i], 0, Yc[i], **quiver_params)
-        elif comps_length == 2:
-            print(f"Frame {i}: magnitude of tangential: {sqrt(pow(tang[i, 0], 2) + pow(tang[i, 1], 2))}")
-            ax.quiver(X_origins[i], Y_origins[i], tang[i, 0], tang[i, 1], **quiver_params)
-            ax.quiver(X_origins[i], Y_origins[i], norm[i, 0], norm[i, 1], **quiver_params)
+        for j in vector_seq:
+            ax.quiver(X_origins[i], Y_origins[i], X_components[j, i], Y_components[j, i], **quiver_params)
+        for j in xy_seq:
+            ax.quiver(X_origins[i], Y_origins[i], X_components[j, i], 0, **quiver_params)
+            ax.quiver(X_origins[i], Y_origins[i], 0, Y_components[j, i], **quiver_params)
+        for j in tang_norm_seq:
+            ax.quiver(X_origins[i], Y_origins[i], tang_components[j, i, 0], tang_components[j, i, 1], **quiver_params)
+            ax.quiver(X_origins[i], Y_origins[i], norm_components[j, i, 0], norm_components[j, i, 1], **quiver_params)
         plt.pause(pause_length)
     plt.show() # check if this plt.show() really goes here
 
@@ -150,6 +168,17 @@ def divergence_point(X, Y, U):
     print("No divergence point exists in the given curve.")
     print()
     return None, None, None, None
+
+
+def parse_vector_input(vectors):
+    xy_vectors = []
+    tang_norm_vectors = []
+    for v in vectors:
+        if v[1] == "xy":
+            xy_vectors.append(v[0])
+        elif v[1] == "tang_norm":
+            tang_norm_vectors.append(v[0])
+    return np.array(xy_vectors), np.array(tang_norm_vectors)
 
 
 def plot_divergent_free_fall(ax, x, y, X_parabolic, Y_parabolic):

@@ -86,7 +86,7 @@ def vector_xy(vector, frame_num, U_origins, Y_origins, X_origins):
     # table of component functions
     x_comp_funcs = {"accel": accel_xcomp, "jerk": jerk_xcomp}
     y_comp_funcs = {"accel": accel_ycomp, "jerk": jerk_ycomp}
-    X_comp = np.empty(frame_num, )
+    X_comp = np.empty(frame_num)
     Y_comp = np.empty(frame_num)
 
     # note the number of components per list equals frame_num

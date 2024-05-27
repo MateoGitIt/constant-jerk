@@ -16,18 +16,17 @@ data = compute_curves()
 view_bounds = [-100, 1500, -1500, 100]
 
 # DIVERGENCE POINT AND TRAJECTORY
-divergence_motion = True
+divergence_motion = False
 div_data = divergence_point(data["rk4"][0], data["rk4"][1], data["u_values"])
 
 # flip the vectors
 
-vectors = [("jerk", "xy"), ("accel", "tangnorm")]
-hodograph_vectors = "jerk_tang_norm"
-scale = 250
+vectors = [("jerk", "tang_norm"), ("accel", "tang_norm")]
+scale = 200
 frames = 150
 pause = 0.001
 fig.canvas.mpl_connect("close_event", exit)
-create_hodograph("rk4", hodograph_vectors, ax, data["rk4"][0], data["rk4"][1], U=data["u_values"], div=(True, *div_data),
+create_hodograph("rk4", vectors, ax, data["rk4"][0], data["rk4"][1], U=data["u_values"], div=(divergence_motion, *div_data),
                     frame_num=frames, pause_length=pause, view=verify_view_bounds(view_bounds), scale=scale)
 
 plt.show()

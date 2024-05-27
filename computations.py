@@ -42,7 +42,7 @@ def Udoubleprime(U_origins, Y_origins, X_origins, u, y):
                 uprime_after = Uprime(U_origins[i + 1], Y_origins[i + 1])
                 hodo_stepsize = X_origins[i + 1] - X_origins[i]
             elif i == U_olength - 1:
-                uprime_before = Uprime(U_origins[i - 1], Y_origins[i + 1])
+                uprime_before = Uprime(U_origins[i - 1], Y_origins[i - 1])
                 uprime_after = Uprime(U_origins[i], y)
                 hodo_stepsize = X_origins[i] - X_origins[i - 1]
             slope = (uprime_after - uprime_before) / hodo_stepsize
