@@ -21,12 +21,13 @@ div_data = divergence_point(data["rk4"][0], data["rk4"][1], data["u_values"])
 
 # flip the vectors
 
-hodograph_type = "jerk_tang_norm"
+vectors = [("jerk", "xy"), ("accel", "tangnorm")]
+hodograph_vectors = "jerk_tang_norm"
 scale = 250
 frames = 150
 pause = 0.001
 fig.canvas.mpl_connect("close_event", exit)
-create_hodograph("rk4", hodograph_type, ax, data["rk4"][0], data["rk4"][1], U=data["u_values"], div=(True, *div_data),
+create_hodograph("rk4", hodograph_vectors, ax, data["rk4"][0], data["rk4"][1], U=data["u_values"], div=(True, *div_data),
                     frame_num=frames, pause_length=pause, view=verify_view_bounds(view_bounds), scale=scale)
 
 plt.show()

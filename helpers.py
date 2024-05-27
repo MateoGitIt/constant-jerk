@@ -34,7 +34,7 @@ def create_plot(type, ax, data=[], div=(False, 0, 0, 0, 0), view=(False, 0, 0, 0
     if type == "rk4":
         ax.plot(data[0], data[1], lw=2, label="y(x)", color="tab:red", zorder=2)
         ax.set_title("Runge-Kutta 4 y(x) curve")
-        if div[0]: 
+        if div[0] and (div[1], div[2]) != (None, None): 
             X_parabolic, Y_parabolic = compute.parabolic_free_fall((div[1], div[2]), div[3], div[4], 1000)
             plot_divergent_free_fall(ax, div[1], div[2], X_parabolic, Y_parabolic)
     elif type == "kinematics":

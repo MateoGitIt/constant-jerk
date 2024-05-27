@@ -20,7 +20,7 @@ div_data = divergence_point(data["rk4"][0], data["rk4"][1], data["u_values"])
 
 best_fit = True
 view = True
-textbox = False
+textbox = True
 best_fit_models = {"3_poly": [1, 1, 1, 1], "2_poly": [1, 1, 1], "5_poly": [1, 1, 1, 1, 1, 1]}
 plots = ["rk4", "kinematics"]
 
@@ -33,8 +33,8 @@ for i, ax in enumerate(axs):
     ax.legend()
 
 
-create_output_file = True
-output_filename = "test2.xlsx"
+create_output_file = False
+output_filename = "negjerk.xlsx"
 file_format = "xlsx"
 if create_output_file:
     export_data(output_filename, data, file_format)
