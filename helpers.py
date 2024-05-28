@@ -125,7 +125,7 @@ def create_hodograph(type, vectors, ax, X, Y, U=[], frame_num=100, pause_length=
     # Compute parabolic free fall trajectory
     div_x, div_y = (div[1], div[2])
     if divergence:
-        X_parabolic, Y_parabolic = compute.parabolic_free_fall((div_x, div_y), div[3], div[4], 1000)
+        X_parabolic, Y_parabolic = compute.parabolic_free_fall((div_x, div_y), div[3], div[4], 100)
     
     # Define ranges outside animation to decrease overhead of calling range()
     vector_seq = range(vectors_size)

@@ -20,7 +20,7 @@ initialHeight = 100
 xmax = 900
 tmax = 19.3
 stepSize = 0.01
-timeIncrement = 0.001
+timeIncrement = 0.01
 
 parameters = {"j_t":  tangentialJerk, 
               "j_f": jerkfactor,

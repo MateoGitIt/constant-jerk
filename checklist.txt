@@ -13,5 +13,11 @@ Allow the user to see jerk and acceleration vectors plotted in the same hodograp
     - Give each vector color
     - Make it so that the user can select one vector plus its xy components and the other vector plus it tang/norm components and so on
 
+Some tips to give the user:
+
+To increase fluency of hodograph:
+- Use greater step sizes and time steps. This decreases the number of sample points the hodograph must plot at each frame
+  and greatly impacts fluency.
+
 CSV FILE FUNCTIONALITY:
 READY. Excel and CSV work. Other formats?

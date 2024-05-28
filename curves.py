@@ -2,13 +2,7 @@ from helpers import create_plot, divergence_point, create_fit_curve
 from helpers_runner import verify_view_bounds, compute_curves, export_data
 import matplotlib.pyplot as plt
 
-# BEST-FIT MODEL: READY
-# CSV OUTPUT FILE: NOT DONE
-# DIVERGENCE MOTION: READY
-# STATIC PLOTS: READY
-# SET VIEW: READY
-
-# ACCEL AND JERK IN SAME PLOT
+# THIS FILE IS FULLY READY. CURVE DISPLAYING IS COMPLETE.
 
 fig, axs = plt.subplots(1, 2)
 data = compute_curves()
