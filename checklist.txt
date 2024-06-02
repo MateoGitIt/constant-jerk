@@ -21,3 +21,9 @@ To increase fluency of hodograph:
 
 CSV FILE FUNCTIONALITY:
 READY. Excel and CSV work. Other formats?
+
+
+There is a bug when the user does no components for accel and xy components for jerk:
+  - The xy components of acceleration and not jerk are displayed
+  - These components are correctly scaled by the scalar factor of jerk, which is correct. The colors are also correct.
+  - Why are the xy and components of accel being computed and displayed tho?

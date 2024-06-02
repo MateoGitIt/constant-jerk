@@ -12,9 +12,9 @@ view_bounds = [-500, 1500, -1500, 500]
 divergence_motion = True
 div_data = divergence_point(data["rk4"][0], data["rk4"][1], data["u_values"])
 
-best_fit = True
-view = True
-textbox = True
+best_fit = False
+view = False
+textbox = False
 best_fit_models = {"3_poly": [1, 1, 1, 1], "2_poly": [1, 1, 1], "5_poly": [1, 1, 1, 1, 1, 1]}
 plots = ["rk4", "kinematics"]
 

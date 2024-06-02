@@ -21,12 +21,12 @@ div_data = divergence_point(data["rk4"][0], data["rk4"][1], data["u_values"])
 
 # flip the vectors
 
-vectors = [("accel", "tang_norm"), ("jerk", "tang_norm")]
-scale = 200 # fix the scale and width of the arrows. They look terrible depending on scale = 1/scale or scale=scale=1
-frames = 300
+colors = ["tab:orange", "tab:blue"]
+vectors = [("accel", 100), ("jerk", 300, "xy")]
+frames = 200
 pause = 0.01
 fig.canvas.mpl_connect("close_event", exit)
 create_hodograph("rk4", vectors, ax, data["rk4"][0], data["rk4"][1], U=data["u_values"], div=(divergence_motion, *div_data),
-                    frame_num=frames, pause_length=pause, view=verify_view_bounds(view_bounds), scale=scale)
+                    frame_num=frames, pause_length=pause, view=verify_view_bounds(view_bounds), color_list=colors)
 
 plt.show()

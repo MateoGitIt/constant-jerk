@@ -82,14 +82,16 @@ def create_fit_curve(model, ax, initial_guess, x1, x2, data=[], curve_tag=""):
 
 # hodograph
 def create_hodograph(type, vectors, ax, X, Y, U=[], frame_num=100, pause_length=0.1, 
-                     div=(False, 0, 0, 0, 0), view=[], scale=1):
+                     div=(False, 0, 0, 0, 0), view=[], color_list=[]):
     
     # Create one origin (x, y) for the vector in each frame
     X_origins = X[::len(X) // frame_num]
     Y_origins = Y[::len(Y) // frame_num]
     U_origins = U[::len(X) // frame_num]
-    xy_vectors, tang_norm_vectors = parse_vector_input(vectors)
+
+    xy_vectors, tang_norm_vectors, xy_scales, tang_norm_scales, total_scales, xy_colors, tang_norm_colors, total_colors = parse_vector_input(vectors, color_list)
     vectors_size = len(vectors)
+
     view_setting = True if len(view) > 0 else False
     divergence = div[0]
 
@@ -97,11 +99,9 @@ def create_hodograph(type, vectors, ax, X, Y, U=[], frame_num=100, pause_length=
     quiver_params = {
         "headaxislength": 3,
         "headlength": 3.5,
-        "width": 1/scale,
-        "color": "black",
+        "width": 0.01,
         "angles": "xy",
         "scale_units": "xy",
-        "scale": 1/scale,
         "zorder": 3
     }
 
@@ -138,13 +138,20 @@ def create_hodograph(type, vectors, ax, X, Y, U=[], frame_num=100, pause_length=
         if view_setting: set_view(ax, view)
         if divergence: plot_divergent_free_fall(ax, div_x, div_y, X_parabolic, Y_parabolic)
         for j in vector_seq:
-            ax.quiver(X_origins[i], Y_origins[i], X_components[j, i], Y_components[j, i], **quiver_params)
+            ax.quiver(X_origins[i], Y_origins[i], X_components[j, i], Y_components[j, i], 
+                      scale=1/total_scales[j], color=total_colors[j], **quiver_params)
         for j in xy_seq:
-            ax.quiver(X_origins[i], Y_origins[i], X_components[j, i], 0, **quiver_params)
-            ax.quiver(X_origins[i], Y_origins[i], 0, Y_components[j, i], **quiver_params)
+            ax.quiver(X_origins[i], Y_origins[i], X_components[j, i], 0, scale=1/xy_scales[j], color=xy_colors[j],
+                      **quiver_params)
+            ax.quiver(X_origins[i], Y_origins[i], 0, Y_components[j, i], scale=1/xy_scales[j], color=xy_colors[j],
+                      **quiver_params)
         for j in tang_norm_seq:
-            ax.quiver(X_origins[i], Y_origins[i], tang_components[j, i, 0], tang_components[j, i, 1], **quiver_params)
-            ax.quiver(X_origins[i], Y_origins[i], norm_components[j, i, 0], norm_components[j, i, 1], **quiver_params)
+            print(f"TANG: {sqrt(pow(tang_components[j, i, 0], 2) + pow(tang_components[j, i, 1], 2))}")
+            #print(f"NORM: {norm_components[j, i, 0]}")
+            ax.quiver(X_origins[i], Y_origins[i], tang_components[j, i, 0], tang_components[j, i, 1], 
+                      scale=1/tang_norm_scales[j], color=tang_norm_colors[j], **quiver_params)
+            ax.quiver(X_origins[i], Y_origins[i], norm_components[j, i, 0], norm_components[j, i, 1], 
+                      scale=1/tang_norm_scales[j], color=tang_norm_colors[j], **quiver_params)
         plt.pause(pause_length)
     plt.show() # check if this plt.show() really goes here
 
@@ -170,15 +177,31 @@ def divergence_point(X, Y, U):
     return None, None, None, None
 
 
-def parse_vector_input(vectors):
+def parse_vector_input(vectors, color_list):
     xy_vectors = []
     tang_norm_vectors = []
-    for v in vectors:
-        if v[1] == "xy":
-            xy_vectors.append(v[0])
-        elif v[1] == "tang_norm":
-            tang_norm_vectors.append(v[0])
-    return np.array(xy_vectors), np.array(tang_norm_vectors)
+    xy_scales = {}
+    tang_norm_scales = {}
+    total_scales = {}
+    total_colors = {}
+    xy_colors = {}
+    tang_norm_colors = {}
+    for i, v in enumerate(vectors):
+        total_colors[i] = color_list[i]
+        total_scales[i] = v[1]
+        if len(v) > 2:
+            if v[2] == "xy":
+                xy_vectors.append(v[0])
+                xy_colors[len(xy_colors)] = color_list[i]
+                xy_scales[len(xy_scales)] = v[1]
+            elif v[2] == "tang_norm":
+                tang_norm_vectors.append(v[0])
+                tang_norm_colors[len(tang_norm_colors)] = color_list[i]
+                tang_norm_scales[len(tang_norm_scales)] = v[1]
+        elif len(v) == 1:
+            exit("You must indicate at least a vector name and a scalar factor")
+
+    return np.array(xy_vectors), np.array(tang_norm_vectors), xy_scales, tang_norm_scales, total_scales, xy_colors, tang_norm_colors, total_colors
 
 
 def plot_divergent_free_fall(ax, x, y, X_parabolic, Y_parabolic):
