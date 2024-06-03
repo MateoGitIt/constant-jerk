@@ -93,12 +93,12 @@ def create_hodograph(type, vectors, ax, X, Y, U=[], frame_num=100, pause_length=
     vectors_size = len(vectors)
 
     view_setting = True if len(view) > 0 else False
-    divergence = div[0]
+    divergence = True if div[0] and (div[1], div[2]) != (None, None) else False
 
     # properties of the arrows displayed by ax.quiver()
     quiver_params = {
-        "headaxislength": 3,
-        "headlength": 3.5,
+        "headaxislength": 1,
+        "headlength": 1.5,
         "width": 0.01,
         "angles": "xy",
         "scale_units": "xy",
@@ -110,7 +110,7 @@ def create_hodograph(type, vectors, ax, X, Y, U=[], frame_num=100, pause_length=
     xy_vector_counter = 0
     vector_labels = []
     for i, v in enumerate(vectors):
-        vector_labels.append(v[0])
+        vector_labels.append(f"{v[0]} scale: {v[1]}")
         Xc, Yc = com.vector_xy(v[0], frame_num, U_origins, Y_origins, X_origins)
         X_components[i, :] = Xc
         Y_components[i, :] = Yc
