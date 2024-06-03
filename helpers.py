@@ -106,12 +106,19 @@ def create_hodograph(type, vectors, ax, X, Y, U=[], frame_num=100, pause_length=
     }
 
     # Compute vectors
-    X_components = np.empty((vectors_size, frame_num))
-    Y_components = np.empty((vectors_size, frame_num))
+    X_components, Y_components, X_comp_additional, Y_comp_additional = [np.empty((vectors_size, frame_num)) for _ in range(4)]
+    xy_vector_counter = 0
+    vector_labels = []
     for i, v in enumerate(vectors):
+        vector_labels.append(v[0])
         Xc, Yc = com.vector_xy(v[0], frame_num, U_origins, Y_origins, X_origins)
         X_components[i, :] = Xc
         Y_components[i, :] = Yc
+        if v[0] in xy_vectors:
+            X_comp_additional[xy_vector_counter] = X_components[i]
+            Y_comp_additional[xy_vector_counter] = Y_components[i]
+            xy_vector_counter += 1
+    vector_labels = np.array(vector_labels)
 
     tang_norm_size = len(tang_norm_vectors)
     if tang_norm_size > 0:
@@ -139,19 +146,18 @@ def create_hodograph(type, vectors, ax, X, Y, U=[], frame_num=100, pause_length=
         if divergence: plot_divergent_free_fall(ax, div_x, div_y, X_parabolic, Y_parabolic)
         for j in vector_seq:
             ax.quiver(X_origins[i], Y_origins[i], X_components[j, i], Y_components[j, i], 
-                      scale=1/total_scales[j], color=total_colors[j], **quiver_params)
+                      scale=1/total_scales[j], color=total_colors[j], label=vector_labels[j], **quiver_params)
         for j in xy_seq:
-            ax.quiver(X_origins[i], Y_origins[i], X_components[j, i], 0, scale=1/xy_scales[j], color=xy_colors[j],
+            ax.quiver(X_origins[i], Y_origins[i], X_comp_additional[j, i], 0, scale=1/xy_scales[j], color=xy_colors[j],
                       **quiver_params)
-            ax.quiver(X_origins[i], Y_origins[i], 0, Y_components[j, i], scale=1/xy_scales[j], color=xy_colors[j],
+            ax.quiver(X_origins[i], Y_origins[i], 0, Y_comp_additional[j, i], scale=1/xy_scales[j], color=xy_colors[j],
                       **quiver_params)
         for j in tang_norm_seq:
-            print(f"TANG: {sqrt(pow(tang_components[j, i, 0], 2) + pow(tang_components[j, i, 1], 2))}")
-            #print(f"NORM: {norm_components[j, i, 0]}")
             ax.quiver(X_origins[i], Y_origins[i], tang_components[j, i, 0], tang_components[j, i, 1], 
                       scale=1/tang_norm_scales[j], color=tang_norm_colors[j], **quiver_params)
             ax.quiver(X_origins[i], Y_origins[i], norm_components[j, i, 0], norm_components[j, i, 1], 
                       scale=1/tang_norm_scales[j], color=tang_norm_colors[j], **quiver_params)
+        plt.legend()
         plt.pause(pause_length)
     plt.show() # check if this plt.show() really goes here
 
@@ -200,7 +206,6 @@ def parse_vector_input(vectors, color_list):
                 tang_norm_scales[len(tang_norm_scales)] = v[1]
         elif len(v) == 1:
             exit("You must indicate at least a vector name and a scalar factor")
-
     return np.array(xy_vectors), np.array(tang_norm_vectors), xy_scales, tang_norm_scales, total_scales, xy_colors, tang_norm_colors, total_colors
 
 

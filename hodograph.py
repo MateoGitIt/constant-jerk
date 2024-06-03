@@ -22,8 +22,8 @@ div_data = divergence_point(data["rk4"][0], data["rk4"][1], data["u_values"])
 # flip the vectors
 
 colors = ["tab:orange", "tab:blue"]
-vectors = [("accel", 100), ("jerk", 300, "xy")]
-frames = 200
+vectors = [("accel", 100, "tang_norm"), ("jerk", 300, "tang_norm")]
+frames = 500
 pause = 0.01
 fig.canvas.mpl_connect("close_event", exit)
 create_hodograph("rk4", vectors, ax, data["rk4"][0], data["rk4"][1], U=data["u_values"], div=(divergence_motion, *div_data),
