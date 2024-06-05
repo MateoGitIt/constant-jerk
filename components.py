@@ -46,7 +46,7 @@ def tangential_accel(u, y):
 
 def normal_accel(u, y):
     common_factor = pow(speed(u, y), 2) * Uprime(u, y) / pow(1 + pow(u, 2), 2)
-    if Jt < 0: common_factor = -1*common_factor # CHECK SIGN LOGIC
+    if Jt > 0: common_factor = -1*common_factor # CHECK SIGN LOGIC
     x_norm = common_factor * (-1 * u)
     y_norm = common_factor
     magnitude = sqrt(pow(x_norm, 2) + pow(y_norm, 2))
