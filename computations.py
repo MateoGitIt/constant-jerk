@@ -7,10 +7,14 @@ Jt, Jf, Q, g, a0, v0, y0, xmax, tmax, h, dt = parameters.values()
 
 # right-hand side of the autonomous differential equation for y''(x) = U'(x)
 def Uprime(u, y):
-    factor1 = Jf * (1 + pow(u, 2)) / (2 * pow(speed(u, y), 2))
-    radicand = pow(g/Q, 2) - (Jf * 4 * speed(u, y) * Jt * (1 + pow(u, 2)))
-    factor2 = (-1 * g/Q) + sqrt(radicand)
-    return factor1 * factor2
+    try:
+        factor1 = Jf * (1 + pow(u, 2)) / (2 * pow(speed(u, y), 2))
+        radicand = pow(g/Q, 2) - (Jf * 4 * speed(u, y) * Jt * (1 + pow(u, 2)))
+        factor2 = (-1 * g/Q) + sqrt(radicand)
+        return factor1 * factor2
+    except OverflowError:
+        exit(f"Math Overflow error: the curve is becoming infinitely steep, breaking down some equations."
+             f"Try using a shorted curve by decreasing xmas in inputParams.py")
     # CHECK THIS FORMULA; IT MIGHT NOT BE THE SAME AS THE ONE IN THE GOOGLE DOCS
 
 # speed as a function of y

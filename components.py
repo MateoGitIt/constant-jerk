@@ -32,8 +32,7 @@ def accel_xcomp(u, y):
 def accel_ycomp(u, y):
     common_factor = 1 / (1 + pow(u, 2))
     first_term = (-1 * g * pow(u, 2)) / Q
-    second_term = (pow(speed(u, y), 2) * Uprime(u, y)) / (1 + pow(u, 2))
-    if Jt < 0: second_term = -1*second_term
+    second_term = Jf*(pow(speed(u, y), 2) * Uprime(u, y)) / (1 + pow(u, 2))
     return common_factor * (first_term + second_term)
 
 
@@ -44,13 +43,21 @@ def tangential_accel(u, y):
     return np.array([x_tan, y_tan]), magnitude
 
 
+def tangential_accel2(u, y):
+    magnitude = (-g / Q) * (u / sqrt(1 + pow(u, 2)))
+    return magnitude * t_hat(u), magnitude
+
+
 def normal_accel(u, y):
-    common_factor = pow(speed(u, y), 2) * Uprime(u, y) / pow(1 + pow(u, 2), 2)
-    if Jt > 0: common_factor = -1*common_factor # CHECK SIGN LOGIC
-    x_norm = common_factor * (-1 * u)
-    y_norm = common_factor
-    magnitude = sqrt(pow(x_norm, 2) + pow(y_norm, 2))
-    return np.array([x_norm, y_norm]), magnitude
+    common_factor = Jf*abs((Uprime(u, y) * pow(speed(u, y), 2)) / pow(1 + pow(u, 2), 3/2))
+    x_norm = common_factor * (-1) * u / sqrt(1 + pow(u, 2))
+    y_norm = common_factor / sqrt(1 + pow(u, 2))
+    return np.array([x_norm, y_norm]), sqrt(pow(x_norm, 2) + pow(y_norm, 2))
+
+
+def normal_accel2(u, y):
+    magnitude = Jf*abs(pow(speed(u, y), 2) * Uprime(u, y) / pow(1 + pow(u, 2), 3/2))
+    return magnitude * n_hat(u), magnitude
 
 
 def jerk_xcomp(u, y):
@@ -75,6 +82,12 @@ def normal_jerk(u, y):
     third_term = (g * u * Uprime(u, y) * speed(u, y)) / pow(1 + pow(u, 2), 2)
     magnitude = first_common_factor * (first_term + second_term) - third_term
     return magnitude * n_hat(u), magnitude
+
+
+# what if we create a dot product function and calculate tangential and normal components
+# by 1) calling this dot product function between a total jerk or accel vectors and t-hat or n-hat, 
+# 2) multiplying corresponding components between themselves, and 3)
+# 
 
 
 def vector_xy(vector, frame_num, U_origins, Y_origins, X_origins):
@@ -103,8 +116,8 @@ def vector_tang_norm(vector, frame_num, U_origins, Y_origins, X_origins):
     Y_origins_cpy = Y_origins.copy()
     X_origins_cpy = X_origins.copy()
 
-    tan_comp_funcs = {"accel": tangential_accel, "jerk": tangential_jerk}
-    norm_comp_funcs = {"accel": normal_accel, "jerk": normal_jerk}
+    tan_comp_funcs = {"accel": tangential_accel2, "jerk": tangential_jerk}
+    norm_comp_funcs = {"accel": normal_accel2, "jerk": normal_jerk}
     tang = np.empty((frame_num, 2))
     norm = np.empty((frame_num, 2))
 

@@ -1,29 +1,6 @@
-HODOGRAPH:
+Problems with acceleration vector:
 
-accel: READY. Looks pretty good.
-accel_xy: READY. Looks pretty good.
-accel_tang_norm: READY. Looks pretty good.
-
-jerk: READY. Looks pretty good.
-jerk_xy: READY. Looks pretty good.
-jerk_tang_norm: READY. Looks pretty good.
-
-Allow the user to see jerk and acceleration vectors plotted in the same hodograph at the same time. 
-    - Each vector now has its own scale number
-    - Give each vector color
-    - Make it so that the user can select one vector plus its xy components and the other vector plus it tang/norm components and so on
-
-Some tips to give the user:
-
-To increase fluency of hodograph:
-- Use greater step sizes and time steps. This decreases the number of sample points the hodograph must plot at each frame
-  and greatly impacts fluency.
-
-CSV FILE FUNCTIONALITY:
-READY. Excel and CSV work. Other formats?
-
-
-There is a bug when the user does no components for accel and xy components for jerk:
-  - The xy components of acceleration and not jerk are displayed
-  - These components are correctly scaled by the scalar factor of jerk, which is correct. The colors are also correct.
-  - Why are the xy and components of accel being computed and displayed tho?
+1. The total accel vector is shorter than the tangential component. This tangential component appears to be way too long or to stay constant.
+2. The normal component does not look normal to the curve, can use angles to check this.
+3. Like the tangential component, the normal component is longer than the total vector, although it does point in the right direction 
+  for both types of curves.
