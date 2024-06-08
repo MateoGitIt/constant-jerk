@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 
 fig, ax = plt.subplots(1, 1)
 data = compute_curves()
-view_bounds = [0, 220, -360, 30]
+view_bounds = [0, 600, 0, 600]
 
 # DIVERGENCE POINT AND TRAJECTORY
 divergence_motion = True
@@ -22,7 +22,7 @@ div_data = divergence_point(data["rk4"][0], data["rk4"][1], data["u_values"])
 # flip the vectors
 
 colors = ["tab:orange", "tab:blue"]
-vectors = [("accel", 10, "tang_norm")]
+vectors = [("jerk", 50, "tang_norm"), ("accel", 25, "xy")]
 frames = 500
 pause = 0.01
 fig.canvas.mpl_connect("close_event", exit)

@@ -32,7 +32,7 @@ def accel_xcomp(u, y):
 def accel_ycomp(u, y):
     common_factor = 1 / (1 + pow(u, 2))
     first_term = (-1 * g * pow(u, 2)) / Q
-    second_term = Jf*(pow(speed(u, y), 2) * Uprime(u, y)) / (1 + pow(u, 2))
+    second_term = (pow(speed(u, y), 2) * Uprime(u, y)) / (1 + pow(u, 2))
     return common_factor * (first_term + second_term)
 
 

@@ -1,6 +1,14 @@
 Problems with acceleration vector:
 
 1. The total accel vector is shorter than the tangential component. This tangential component appears to be way too long or to stay constant.
-2. The normal component does not look normal to the curve, can use angles to check this.
+2. The normal component does not look normal to the curve, can use angles to check this. IT IS NORMAL! IT LOOKS WEIRD THOUGH.
 3. Like the tangential component, the normal component is longer than the total vector, although it does point in the right direction 
   for both types of curves.
+
+4. Line 28, components.py: why does it work, is the math wrong. 
+
+
+PROBLEM 1: SOLVED. tangential2 and normal2 work well.
+PROBLEM 2: SOLVED. non-square grids shift the angles and make them no longer look normal.
+PROBLEM 3: SOLVED. 
+
