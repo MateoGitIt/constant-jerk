@@ -12,3 +12,11 @@ PROBLEM 1: SOLVED. tangential2 and normal2 work well.
 PROBLEM 2: SOLVED. non-square grids shift the angles and make them no longer look normal.
 PROBLEM 3: SOLVED. 
 
+Remove X, Y kinematics, and include normal and tangential components of jerk and acceleration. DONE
+  - Add a progress bar though, for long curves and small stepsizes, the program starts to take a lot of time.
+
+Besides the button, print out the state of the hodograph to the plot via textbox (magnitude of the plotted components, magnitude of the total vector,
+ and angle relative to the curve). 
+
+ In the documentation, mention that if you run the code and see an empty grid, it might be bc you forgot about changing the view bounds. 
+

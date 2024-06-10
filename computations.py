@@ -28,8 +28,8 @@ def parabolic_free_fall(divPoint, u, speed, duration):
     X = list(range(len(t)))
     Y = list(range(len(t)))
     for i, t in enumerate(t):
-        X[i] = divPoint[0] + (abs(speed) * cos(atan(u))) * t
-        Y[i] = divPoint[1] + (abs(speed) * sin(atan(u))) * t - (g/2) * pow(t, 2)
+        X[i] = divPoint[0] + (abs(speed) * cos(local_angle(u))) * t
+        Y[i] = divPoint[1] + (abs(speed) * sin(local_angle(u))) * t - (g/2) * pow(t, 2)
     return X, Y
 
 # this function searches for u and y in U_origins and Y_origins and calculates Uprime at the (i+1)-th and (i-1)-th positions
@@ -51,3 +51,7 @@ def Udoubleprime(U_origins, Y_origins, X_origins, u, y):
                 hodo_stepsize = X_origins[i] - X_origins[i - 1]
             slope = (uprime_after - uprime_before) / hodo_stepsize
     return slope
+
+
+def local_angle(u):
+    return atan(u)

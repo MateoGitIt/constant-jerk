@@ -22,7 +22,7 @@ div_data = divergence_point(data["rk4"][0], data["rk4"][1], data["u_values"])
 # flip the vectors
 
 colors = ["tab:orange", "tab:blue"]
-vectors = [("jerk", 50, "tang_norm"), ("accel", 25, "xy")]
+vectors = [("accel", 25, "tang_norm")]
 frames = 500
 pause = 0.01
 fig.canvas.mpl_connect("close_event", exit)

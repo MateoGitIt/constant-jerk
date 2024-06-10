@@ -17,9 +17,9 @@ g = 9.81
 initialAcceleration = 1
 initialSpeed = 1
 initialHeight = 600
-xmax = 300
-tmax = 1
-stepSize = 0.01
+xmax = 205
+tmax = 8.8
+stepSize = 0.001
 timeIncrement = 0.01
 
 parameters = {"j_t":  tangentialJerk, 

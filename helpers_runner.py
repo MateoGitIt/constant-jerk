@@ -1,5 +1,9 @@
 from rungekutta import rungekutta_main
 from simulated import simulated_main
+from components import tangential_accel2, normal_accel2, tangential_jerk, normal_jerk, components_file_local_copy
+from computations import local_angle
+from math import degrees
+import numpy as np
 import pandas as pd
 import csv
 
@@ -21,36 +25,44 @@ def compute_curves():
     return {"rk4": [rk_X, rk_Y], "kinematics": [kin_X, kin_Y], "u_values": U}
 
 
-def export_data(output_filename, data, file_format):
+def export_data(output_filename, file_format, data, vector_data):
+    tang_norm_components = {}
+    if vector_data:
+        components_file_local_copy(data["u_values"], data["rk4"][1], data["rk4"][0])
+        tang_norm_components = output_vector_data(data["rk4"][1], data["u_values"])
+
     if file_format == "xlsx":
-        write_xlsx(output_filename, data)
+        write_xlsx(output_filename, {**format_rk_data(data), **tang_norm_components})
     elif file_format == "csv":
-        write_csv(output_filename, data)
+        write_csv(output_filename, {**format_rk_data(data), **tang_norm_components})
 
 
-def write_xlsx(filename, raw_data):
-    data = format_data(raw_data)
+def write_xlsx(filename, data):
     df = pd.DataFrame(data)
     df.to_excel(filename, index=False)
 
 
-def write_csv(filename, raw_data):
-    data = format_data(raw_data)
-    length_rk = len(data["rk_X"])
-
+def write_csv(filename, data):
+    data_points = len(data["rk_X"])
     with open(filename, "w") as f:
         fieldnames = data.keys()
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
-        for i in range(length_rk):
-            row = {
-                "rk_X": data["rk_X"][i], 
-                "rk_Y": data["rk_Y"][i],
-                "U": data["U"][i],
-                "ki_X": data["ki_X"][i],
-                "ki_Y": data["ki_Y"][i]
-                }
+        for i in range(data_points):
+            row = {}
+            for key, value in data.items():
+                row[key] = round(value[i], 5) # round to five decimal places
             writer.writerow(row)
+
+def format_rk_data(data):
+    angle_data = np.array([degrees(local_angle(u)) for u in data["u_values"]])
+    result = {
+        "rk_X": data["rk4"][0],
+        "rk_y": data["rk4"][1],
+        "U": data["u_values"],
+        "angle": angle_data
+    }
+    return result
 
 
 def format_data(data):
@@ -94,4 +106,13 @@ def format_data(data):
         }
     return {**new_rk_data, **new_ki_data}
 
-    
+
+def output_vector_data(Y, U):
+    data_points = len(Y)
+    tang_accel, norm_accel, tang_jerk, norm_jerk = [np.empty(data_points) for _ in range(4)]
+    for i in range(data_points):
+        tang_accel[i] = tangential_accel2(U[i], Y[i])[1]
+        norm_accel[i] = normal_accel2(U[i], Y[i])[1]
+        tang_jerk[i] = tangential_jerk(U[i], Y[i])[1]
+        norm_jerk[i] = normal_jerk(U[i], Y[i])[1]
+    return {"tang_accel": tang_accel, "norm_accel": norm_accel, "tang_jerk": tang_jerk, "norm_jerk": norm_jerk}

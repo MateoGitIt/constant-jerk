@@ -6,7 +6,7 @@ the primary scripts rungekutta.py and simulation.py.
 """
 
 from inputParams import parameters
-from math import sqrt, pow, isclose, acos, degrees
+from math import sqrt, pow, isclose
 from scipy.optimize import curve_fit
 from string import ascii_lowercase as alph
 from sklearn.metrics import r2_score
@@ -128,8 +128,6 @@ def create_hodograph(type, vectors, ax, X, Y, U=[], frame_num=100, pause_length=
             tang, norm = com.vector_tang_norm(vector, frame_num, U_origins, Y_origins, X_origins)
             tang_components[i] = tang
             norm_components[i] = norm
-    
-    check_angle(tang_components[0], norm_components[0])
 
     # Compute parabolic free fall trajectory
     div_x, div_y = (div[1], div[2])
@@ -161,7 +159,6 @@ def create_hodograph(type, vectors, ax, X, Y, U=[], frame_num=100, pause_length=
                       scale=1/tang_norm_scales[j], color=tang_norm_colors[j], **quiver_params)
         plt.legend()
         plt.pause(pause_length)
-    plt.show() # check if this plt.show() really goes here
 
 
 def dot_product(v, w):
@@ -171,13 +168,6 @@ def dot_product(v, w):
 def magnitude(v):
     return sqrt(pow(v[0], 2) + pow(v[1], 2))
 
-
-def check_angle(tan_vec, norm_vect):
-    for i, tanv in enumerate(tan_vec):
-        print()
-        left_side = dot_product(tanv, norm_vect[i]) / (magnitude(tanv) * magnitude(norm_vect[i]))
-        angle = acos(left_side)
-        print(f"{i} angle: {degrees(angle)}")
 
 def divergence_point(X, Y, U):
 

@@ -89,12 +89,15 @@ def normal_jerk(u, y):
 # 2) multiplying corresponding components between themselves, and 3)
 # 
 
-
-def vector_xy(vector, frame_num, U_origins, Y_origins, X_origins):
+def components_file_local_copy(U_origins, Y_origins, X_origins):
     global U_origins_cpy, Y_origins_cpy, X_origins_cpy
     U_origins_cpy = U_origins.copy()
     Y_origins_cpy = Y_origins.copy()
     X_origins_cpy = X_origins.copy()
+
+
+def vector_xy(vector, frame_num, U_origins, Y_origins, X_origins):
+    components_file_local_copy(U_origins, Y_origins, X_origins)
 
     # table of component functions
     x_comp_funcs = {"accel": accel_xcomp, "jerk": jerk_xcomp}
@@ -110,11 +113,8 @@ def vector_xy(vector, frame_num, U_origins, Y_origins, X_origins):
 
 
 def vector_tang_norm(vector, frame_num, U_origins, Y_origins, X_origins):
-    # Allow other normal_jerk to call Udoubleprime by accessing U values
-    global U_origins_cpy, Y_origins_cpy, X_origins_cpy
-    U_origins_cpy = U_origins.copy()
-    Y_origins_cpy = Y_origins.copy()
-    X_origins_cpy = X_origins.copy()
+    # Allow other normal_jerk to call Udoubleprime
+    components_file_local_copy(U_origins, Y_origins, X_origins)
 
     tan_comp_funcs = {"accel": tangential_accel2, "jerk": tangential_jerk}
     norm_comp_funcs = {"accel": normal_accel2, "jerk": normal_jerk}
