@@ -129,15 +129,6 @@ def create_hodograph(type, vectors, ax, X, Y, U=[], frame_num=100, pause_length=
             tang_components[i] = tang
             norm_components[i] = norm
 
-    length = len(X_components[0])
-    for i in range(length):
-        print()
-        print(f"Magnitude of total: {sqrt(pow(X_components[0][i], 2) + pow(Y_components[0][i], 2))}")
-        tangential_mag = sqrt(pow(tang_components[0][i][0], 2) + pow(tang_components[0][i][1], 2))
-        normal_mag = sqrt(pow(norm_components[0][i][0], 2) + pow(norm_components[0][i][1], 2))
-        tangential_normal_sum = sqrt(pow(tangential_mag, 2) + pow(normal_mag, 2))
-        print(f"Tangential squared + normal squared: {tangential_normal_sum}")
-
     # Compute parabolic free fall trajectory
     div_x, div_y = (div[1], div[2])
     if divergence:
