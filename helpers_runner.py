@@ -51,7 +51,7 @@ def write_csv(filename, data):
         for i in range(data_points):
             row = {}
             for key, value in data.items():
-                row[key] = round(value[i], 5) # round to five decimal places
+                row[key] = round(value[i], rounding_decimals) # round to five decimal places
             writer.writerow(row)
 
 def format_rk_data(data):

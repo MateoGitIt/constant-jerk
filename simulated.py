@@ -14,7 +14,7 @@ COMMAND-LINE USE: python simulated.py [vector] [frame_number] [pause_length]
 """
 
 # unpack inputs from "inputParams.py"
-Jt, Jf, Q, g, a0, v0, y0, xmax, tmax, h, dt = parameters.values()
+Jt, Jf, Q, g, a0, v0, y0, xmax, tmax, h, dt, decs = parameters.values()
 
 # declare time, X and Y arrays
 X = []

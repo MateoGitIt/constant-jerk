@@ -16,7 +16,7 @@ COMMAND-LINE USE: python rungekutta.py [vector] [frame number] [pause length]
 """
 
 # unpack inputs from "inputParams.py"
-Jt, Jf, Q, g, a0, v0, y0, xmax, tmax, h, dt = parameters.values()
+Jt, Jf, Q, g, a0, v0, y0, xmax, tmax, h, dt, decs = parameters.values()
 
 # declare array for U_i, Y_i, and x_i values
 U = []

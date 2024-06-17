@@ -4,7 +4,7 @@ from computations import Uprime, speed, Udoubleprime
 import numpy as np
 
 # unpack inputs from "inputParams.py"
-Jt, Jf, Q, g, a0, v0, y0, xmax, tmax, h, dt = parameters.values()
+Jt, Jf, Q, g, a0, v0, y0, xmax, tmax, h, dt, rounding_decimals = parameters.values()
 U_origins_cpy = None
 Y_origins_cpy = None
 X_origins_cpy = None
@@ -128,14 +128,14 @@ def vector_xy_point(vector, i, X, Y, U):
     y_comp_funcs = {"accel": accel_ycomp, "jerk": jerk_ycomp}
     x_comp = x_comp_funcs[vector](U[i], Y[i])
     y_comp = y_comp_funcs[vector](U[i], Y[i])
-    return x_comp, y_comp, sqrt(pow(x_comp, 2), pow(y_comp, 2))
+    return x_comp, y_comp, sqrt(pow(x_comp, 2) + pow(y_comp, 2))
 
 def vector_tang_norm_point(vector, i, X, Y, U):
     if vector == "jerk": components_file_local_copy(U, Y, X)
     tan_comp_funcs = {"accel": tangential_accel2, "jerk": tangential_jerk}
     norm_comp_funcs = {"accel": normal_accel2, "jerk": normal_jerk}
-    tan_comp = tan_comp_funcs[vector](U[i], Y[i])
-    norm_comp = norm_comp_funcs[vector](U[i], Y[i])
+    tan_comp = tan_comp_funcs[vector](U[i], Y[i])[1]
+    norm_comp = norm_comp_funcs[vector](U[i], Y[i])[1]
     return tan_comp, norm_comp, sqrt(pow(tan_comp, 2) + pow(norm_comp, 2))
 
 def veloc_xcomp(u, speed):

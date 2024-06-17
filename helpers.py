@@ -14,12 +14,13 @@ import sigfig as sf
 import time
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.quiver as matquiver
 import model_funcs as mf # type: ignore
 import components as com # type: ignore
 import computations as compute # type: ignore
 
 # unpack inputs from "inputParams.py"
-Jt, Jf, Q, g, a0, v0, y0, xmax, tmax, h, dt = parameters.values()
+Jt, Jf, Q, g, a0, v0, y0, xmax, tmax, h, dt, decs = parameters.values()
 pause_state = False
 final_frame = 0
 pause_keys = ['p', '\b', 'enter', 'escape']
@@ -169,7 +170,11 @@ def create_hodograph(type, vectors, ax, X, Y, U=[], frame_num=100, pause_length=
         if pause_state:
             print_final_hodo_state(frame_num, i, xy_vectors, tang_norm_vectors, total_vectors,
                                    X_origins, Y_origins, U_origins)
-            plot_final_hodo_state()
+            create_plot(type, ax, data=[X, Y])
+            if view_setting: set_view(ax, view)
+            if divergence: plot_divergent_free_fall(ax, div_x, div_y, X_parabolic, Y_parabolic)
+            plot_final_vectors(ax, quiver_params)
+            plt.show()
             break
 
 
@@ -180,30 +185,36 @@ def pause_hodograph(event):
 
 
 def print_final_hodo_state(frame_num, i, xy_vectors, tang_norm_vectors, total_vectors, X, Y, U):
-    print(f"Paused at frame {i} out of {frame_num}")   
+    print(f"Paused at frame {i} out of {frame_num}")
+    print(f"local angle: {round(degrees(compute.local_angle(U[i])), decs)}°\n")  
     for vector in total_vectors:
-        print(vector.capitalize())
-        x_comp, y_comp, magnitude = com.xy_vector_point(vector, i, X, Y, U)
-        print(f"Magnitude: {magnitude} {units(vector)}")
+        if vector == "accel": print("Acceleration")
+        else: print(vector.capitalize())
+        x_comp, y_comp, magnitude = com.vector_xy_point(vector, i, X, Y, U)
+        print(f"magnitude: {round(magnitude, decs)} {units(vector)}\n")
 
     for vector in xy_vectors:
-        print(vector.capitalize())
-        x_comp, y_comp, magnitude = com.xy_vector_point(vector, i, X, Y, U)
-        print(f"x component: {x_comp} {units(vector)}")
-        print(f"y component: {y_comp} {units(vector)}")
-        print(f"magnitude: {magnitude} {units(vector)}")
+        if vector == "accel": print("Acceleration")
+        else: print(vector.capitalize())
+        x_comp, y_comp, magnitude = com.vector_xy_point(vector, i, X, Y, U)
+        print(f"x component: {round(x_comp, decs)} {units(vector)}")
+        print(f"y component: {round(y_comp, decs)} {units(vector)}")
+        print(f"magnitude: {round(magnitude, decs)} {units(vector)}\n")
 
     for vector in tang_norm_vectors:
-        print(vector.capitalize())
-        tang, norm, magnitude = com.tang_norm_vector_point(vector, i, X, Y, U)
-        print(f"tangential: {tang} {units(vector)}")
-        print(f"normal: {norm} {units(vector)}")
-        print(f"magnitude: {magnitude} {units(vector)}")
+        if vector == "accel": print("Acceleration")
+        else: print(vector.capitalize())
+        tang, norm, magnitude = com.vector_tang_norm_point(vector, i, X, Y, U)
+        print(f"tangential: {round(tang, decs)} {units(vector)}")
+        print(f"normal: {round(norm, decs)} {units(vector)}")
+        print(f"magnitude: {round(magnitude, decs)} {units(vector)}\n")
 
-    print(f"local angle: {degrees(compute.local_angle(U[i]))}°")
 
-def plot_final_hodo_state():
-    pass
+def plot_final_vectors(ax, quiver_params):
+    quiver_arrows = [child for child in ax.get_children() if isinstance(child, matquiver.Quiver)]
+    for vector in quiver_arrows:
+        ax.quiver(vector.X, vector.Y, vector.U, vector.V, scale=vector.scale, color=vector.get_facecolor()[0],
+                  label=vector._label, **quiver_params)
 
 
 def dot_product(v, w):
@@ -219,16 +230,16 @@ def divergence_point(X, Y, U):
     # find (X_i, Y_i) where normal acceleration due to gravity is less than the radial acceleration of the curvature
     print()
     for i in range(len(X)):
-        veloc = compute.speed(U[i], Y[i])
-        radial_accel = pow(veloc, 2) * (compute.Uprime(U[i], Y[i]) / pow(sqrt(1 + pow(U[i], 2)), 3))
+        speed = compute.speed(U[i], Y[i])
+        radial_accel = pow(speed, 2) * (compute.Uprime(U[i], Y[i]) / pow(sqrt(1 + pow(U[i], 2)), 3))
         normal_gravity_accel = g / sqrt(1 + pow(U[i], 2))
 
-        if Jt > 0: radial_accel = abs(radial_accel) # DOUBLE CHECK THE LOGIC OF THESE SIGNS
+        if Jt > 0: radial_accel = abs(radial_accel) 
         elif Jt < 0 and radial_accel < 0: radial_accel = -1 * radial_accel
 
         if radial_accel > normal_gravity_accel:
-            print_divPoint(X[i], Y[i], radial_accel, normal_gravity_accel, veloc)
-            return X[i], Y[i], U[i], veloc
+            print_divPoint(round(X[i], decs), round(Y[i], decs), round(radial_accel, decs), round(normal_gravity_accel, decs), round(speed, decs))
+            return X[i], Y[i], U[i], speed
         
     print("No divergence point exists in the given curve.")
     print()
@@ -268,9 +279,9 @@ def plot_divergent_free_fall(ax, x, y, X_parabolic, Y_parabolic):
 
 def print_divPoint(x, y, radial_accel, normal_gravity_accel, speed):
     print(f"Divergence point: (x, y) = ({x}, {y})")
-    print(f"Radial accel. due to curvature: {radial_accel} m/s^2")
-    print(f"Normal accel. due to gravity: {normal_gravity_accel} m/s^2")
-    print(f"Speed: {speed} m/s")
+    print(f"radial accel. due to curvature: {radial_accel} m/s^2")
+    print(f"normal accel. due to gravity: {normal_gravity_accel} m/s^2")
+    print(f"speed: {speed} m/s")
     print()
 
 

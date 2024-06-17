@@ -21,6 +21,7 @@ xmax = 500
 tmax = 8.8
 stepSize = 0.01
 timeIncrement = 0.01
+rounding_decimals = 5
 
 parameters = {"j_t":  tangentialJerk, 
               "j_f": jerkfactor,
@@ -32,5 +33,6 @@ parameters = {"j_t":  tangentialJerk,
               "xmax": xmax,
               "tmax": tmax,
               "h": stepSize,
-              "dt": timeIncrement}
+              "dt": timeIncrement,
+              "rounding_decimals": rounding_decimals}
 

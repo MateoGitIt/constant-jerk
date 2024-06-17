@@ -3,7 +3,7 @@ from math import sqrt, pow, sin, cos, atan
 import numpy as np
 
 # unpack inputs from "inputParams.py"
-Jt, Jf, Q, g, a0, v0, y0, xmax, tmax, h, dt = parameters.values()
+Jt, Jf, Q, g, a0, v0, y0, xmax, tmax, h, dt, rounding_decimals = parameters.values()
 
 # right-hand side of the autonomous differential equation for y''(x) = U'(x)
 def Uprime(u, y):
@@ -15,7 +15,6 @@ def Uprime(u, y):
     except OverflowError:
         exit(f"Math Overflow error: the curve is becoming infinitely steep, breaking down some equations."
              f"Try using a shorter curve by decreasing xmax in inputParams.py")
-    # CHECK THIS FORMULA; IT MIGHT NOT BE THE SAME AS THE ONE IN THE GOOGLE DOCS
 
 # speed as a function of y
 def speed(u, y):
