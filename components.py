@@ -84,11 +84,6 @@ def normal_jerk(u, y):
     return magnitude * n_hat(u), magnitude
 
 
-# what if we create a dot product function and calculate tangential and normal components
-# by 1) calling this dot product function between a total jerk or accel vectors and t-hat or n-hat, 
-# 2) multiplying corresponding components between themselves, and 3)
-# 
-
 def components_file_local_copy(U_origins, Y_origins, X_origins):
     global U_origins_cpy, Y_origins_cpy, X_origins_cpy
     U_origins_cpy = U_origins.copy()
@@ -125,6 +120,23 @@ def vector_tang_norm(vector, frame_num, U_origins, Y_origins, X_origins):
         tang[i] = tan_comp_funcs[vector](U_origins[i], Y_origins[i])[0]
         norm[i] = norm_comp_funcs[vector](U_origins[i], Y_origins[i])[0]
     return tang, norm
+
+
+def vector_xy_point(vector, i, X, Y, U):
+    if vector == "jerk": components_file_local_copy(U, Y, X)
+    x_comp_funcs = {"accel": accel_xcomp, "jerk": jerk_xcomp}
+    y_comp_funcs = {"accel": accel_ycomp, "jerk": jerk_ycomp}
+    x_comp = x_comp_funcs[vector](U[i], Y[i])
+    y_comp = y_comp_funcs[vector](U[i], Y[i])
+    return x_comp, y_comp, sqrt(pow(x_comp, 2), pow(y_comp, 2))
+
+def vector_tang_norm_point(vector, i, X, Y, U):
+    if vector == "jerk": components_file_local_copy(U, Y, X)
+    tan_comp_funcs = {"accel": tangential_accel2, "jerk": tangential_jerk}
+    norm_comp_funcs = {"accel": normal_accel2, "jerk": normal_jerk}
+    tan_comp = tan_comp_funcs[vector](U[i], Y[i])
+    norm_comp = norm_comp_funcs[vector](U[i], Y[i])
+    return tan_comp, norm_comp, sqrt(pow(tan_comp, 2) + pow(norm_comp, 2))
 
 def veloc_xcomp(u, speed):
     return abs(speed) * cos(atan(u))

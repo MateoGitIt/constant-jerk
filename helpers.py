@@ -6,7 +6,7 @@ the primary scripts rungekutta.py and simulation.py.
 """
 
 from inputParams import parameters
-from math import sqrt, pow, isclose
+from math import sqrt, pow, isclose, degrees
 from scipy.optimize import curve_fit
 from string import ascii_lowercase as alph
 from sklearn.metrics import r2_score
@@ -20,6 +20,9 @@ import computations as compute # type: ignore
 
 # unpack inputs from "inputParams.py"
 Jt, Jf, Q, g, a0, v0, y0, xmax, tmax, h, dt = parameters.values()
+pause_state = False
+final_frame = 0
+pause_keys = ['p', '\b', 'enter', 'escape']
 
 
 # y(x) plot features
@@ -109,8 +112,9 @@ def create_hodograph(type, vectors, ax, X, Y, U=[], frame_num=100, pause_length=
     X_components, Y_components, X_comp_additional, Y_comp_additional = [np.empty((vectors_size, frame_num)) for _ in range(4)]
     xy_vector_counter = 0
     vector_labels = []
+    total_vectors = []
     for i, v in enumerate(vectors):
-        vector_labels.append(f"{v[0]} scale: {v[1]}")
+        vector_labels.append(f"{v[0]} (scale: {v[1]})")
         Xc, Yc = com.vector_xy(v[0], frame_num, U_origins, Y_origins, X_origins)
         X_components[i, :] = Xc
         Y_components[i, :] = Yc
@@ -118,7 +122,10 @@ def create_hodograph(type, vectors, ax, X, Y, U=[], frame_num=100, pause_length=
             X_comp_additional[xy_vector_counter] = X_components[i]
             Y_comp_additional[xy_vector_counter] = Y_components[i]
             xy_vector_counter += 1
+        elif (v[0] not in xy_vectors) and (v[0] not in tang_norm_vectors):
+            total_vectors.append(v[0])
     vector_labels = np.array(vector_labels)
+    total_vectors = np.array(total_vectors)
 
     tang_norm_size = len(tang_norm_vectors)
     if tang_norm_size > 0:
@@ -159,6 +166,44 @@ def create_hodograph(type, vectors, ax, X, Y, U=[], frame_num=100, pause_length=
                       scale=1/tang_norm_scales[j], color=tang_norm_colors[j], **quiver_params)
         plt.legend()
         plt.pause(pause_length)
+        if pause_state:
+            print_final_hodo_state(frame_num, i, xy_vectors, tang_norm_vectors, total_vectors,
+                                   X_origins, Y_origins, U_origins)
+            plot_final_hodo_state()
+            break
+
+
+def pause_hodograph(event):
+    if event.key in pause_keys:
+        global pause_state
+        pause_state = True
+
+
+def print_final_hodo_state(frame_num, i, xy_vectors, tang_norm_vectors, total_vectors, X, Y, U):
+    print(f"Paused at frame {i} out of {frame_num}")   
+    for vector in total_vectors:
+        print(vector.capitalize())
+        x_comp, y_comp, magnitude = com.xy_vector_point(vector, i, X, Y, U)
+        print(f"Magnitude: {magnitude} {units(vector)}")
+
+    for vector in xy_vectors:
+        print(vector.capitalize())
+        x_comp, y_comp, magnitude = com.xy_vector_point(vector, i, X, Y, U)
+        print(f"x component: {x_comp} {units(vector)}")
+        print(f"y component: {y_comp} {units(vector)}")
+        print(f"magnitude: {magnitude} {units(vector)}")
+
+    for vector in tang_norm_vectors:
+        print(vector.capitalize())
+        tang, norm, magnitude = com.tang_norm_vector_point(vector, i, X, Y, U)
+        print(f"tangential: {tang} {units(vector)}")
+        print(f"normal: {norm} {units(vector)}")
+        print(f"magnitude: {magnitude} {units(vector)}")
+
+    print(f"local angle: {degrees(compute.local_angle(U[i]))}°")
+
+def plot_final_hodo_state():
+    pass
 
 
 def dot_product(v, w):
@@ -221,11 +266,11 @@ def plot_divergent_free_fall(ax, x, y, X_parabolic, Y_parabolic):
     ax.plot(X_parabolic, Y_parabolic, linestyle="dotted", color="gray", label="Parabolic free fall", zorder=1)
 
 
-def print_divPoint(x, y, radial_accel, normal_gravity_accel, veloc):
+def print_divPoint(x, y, radial_accel, normal_gravity_accel, speed):
     print(f"Divergence point: (x, y) = ({x}, {y})")
     print(f"Radial accel. due to curvature: {radial_accel} m/s^2")
     print(f"Normal accel. due to gravity: {normal_gravity_accel} m/s^2")
-    print(f"Speed: {veloc} m/s")
+    print(f"Speed: {speed} m/s")
     print()
 
 
@@ -233,6 +278,8 @@ def print_initial_conditions(ax):
     text = f"Height: {y0}m\nSpeed: {v0}m/s\nAccel: {a0}m/s2\nJerk:{Jt}m/s3"
     box = dict(boxstyle='round', fc='blanchedalmond', ec='orange', alpha=0.5, pad=0.5)
     x, y = (0.65 * ax.get_xlim()[1], 0.93 * ax.get_ylim()[0])
+    if y == 0:
+        y = 0.07 * ax.get_ylim()[1]
     ax.text(x, y, text, fontsize=10, bbox=box, horizontalalignment='left')
 
 def print_popt(model, curve_tag, *params):
@@ -257,6 +304,15 @@ def print_popt(model, curve_tag, *params):
 
 def r2_coefficient(Y_pred, Y_true):
     return r2_score(Y_true, Y_pred)
+
+
+def units(vector):
+    if vector == "jerk":
+        return "m/s^3"
+    elif vector == "accel":
+        return "m/s^2"
+    else:
+        return ""
 
 
 # adaptive x-axis

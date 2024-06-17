@@ -14,9 +14,19 @@ PROBLEM 3: SOLVED.
 
 Remove X, Y kinematics, and include normal and tangential components of jerk and acceleration. DONE
   - Add a progress bar though, for long curves and small stepsizes, the program starts to take a lot of time.
+  - Do the math for line 28. Figure out why it works.
 
 Besides the button, print out the state of the hodograph to the plot via textbox (magnitude of the plotted components, magnitude of the total vector,
  and angle relative to the curve). 
 
  In the documentation, mention that if you run the code and see an empty grid, it might be bc you forgot about changing the view bounds. 
 
+PENDING:
+- Add a progress bar for the output file, for long curves and small stepsizes, the program starts to take a lot of time.
+- Do the math for line 28. Figure out why it works.
+- Give the user the option to export data on the xy-components of the tangential and normal components. 
+- Besides the button, print out the state of the hodograph to the terminal (magnitude of the plotted components, magnitude of the total vector,
+ and angle relative to the curve). Write a function that computes all the required components at the (X, Y, U) point
+ the hodograph is paused using final_state = i. Use the total_vector list thing (or the stuff returned by 
+ parse_vector_input()) to know all the components that must be plotted. Include magnitude of the plotted components,
+magnitude of the total vector, and local angle.

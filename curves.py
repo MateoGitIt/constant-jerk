@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 fig, axs = plt.subplots(1, 2)
 data = compute_curves()
-view_bounds = [0, 220, 0, 600]
+view_bounds = [0, 600, 0, 600]
 
 # DIVERGENCE POINT AND TRAJECTORY
 divergence_motion = True
