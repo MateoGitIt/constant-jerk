@@ -23,7 +23,7 @@ import computations as compute # type: ignore
 Jt, Jf, Q, g, a0, v0, y0, xmax, tmax, h, dt, decs = parameters.values()
 pause_state = False
 final_frame = 0
-pause_keys = ['p', '\b', 'enter', 'escape']
+pause_keys = ['p', 'enter', 'escape']
 
 
 # y(x) plot features
