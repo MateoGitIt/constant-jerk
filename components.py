@@ -24,9 +24,8 @@ def n_hat(u):
 
 def accel_xcomp(u, y):
     common_factor = u / (1 + pow(u, 2))
-    third_fraction = pow(speed(u, y), 2) * Uprime(u, y) / (1 + pow(u, 2))
-    #if Jt < 0: third_fraction = -1*third_fraction # CHECK SIGN LOGIC
-    return common_factor * (-1*(g/Q) - third_fraction)
+    third_fraction = Jf*pow(speed(u, y), 2) * Uprime(u, y) / (1 + pow(u, 2))
+    return common_factor *(-1*(g/Q) + third_fraction)
 
 
 def accel_ycomp(u, y):

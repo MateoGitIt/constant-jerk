@@ -3,10 +3,12 @@ from simulated import simulated_main
 from components import tangential_accel2, normal_accel2, tangential_jerk, normal_jerk, components_file_local_copy
 from computations import local_angle
 from math import degrees
+from inputParams import parameters
 import numpy as np
 import pandas as pd
 import csv
 
+Jt, Jf, Q, g, a0, v0, y0, xmax, tmax, h, dt, rounding_decimals = parameters.values()
 
 def verify_view_bounds(bounds):
     for b in bounds:
@@ -20,8 +22,14 @@ def verify_view_bounds(bounds):
 
 
 def compute_curves():
-    rk_X, rk_Y, U = rungekutta_main()
-    kin_X, kin_Y = simulated_main()
+    try:
+        rk_X, rk_Y, U = rungekutta_main()
+        kin_X, kin_Y = simulated_main()
+    except Exception as e:
+        print(f"An error ocurred calculating the curves with the initial conditions provided: {e}. "
+              "Physically impossible initial conditions may cause some equations to break down. " 
+              "Try different initial conditions.")
+        exit()
     return {"rk4": [rk_X, rk_Y], "kinematics": [kin_X, kin_Y], "u_values": U}
 
 

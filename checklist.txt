@@ -20,6 +20,9 @@ Besides the button, print out the state of the hodograph to the plot via textbox
  and angle relative to the curve). 
 
  In the documentation, mention that if you run the code and see an empty grid, it might be bc you forgot about changing the view bounds. 
+ Also mention that some tangential components may look larger than the total vector because the normal component
+ may point backward and not look normal to the curve (bc of the non-square grid), but the head-to-tail addition
+ of the normal and tangential yields the total correctly. 
 
 PENDING:
 - Add a progress bar for the output file, for long curves and small stepsizes, the program starts to take a lot of time.
